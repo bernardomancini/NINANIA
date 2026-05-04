@@ -404,13 +404,16 @@ function renderTable(id,rows){
   }).join('');
 }
 
+const PFX={pizzerna:'pz',coliseo:'co',dulcerna:'dul',berna:'berna'};
+
 function activateBrand(brand){
   const d=DATA[brand];if(!d)return;
   const C=COLORS[brand];
   const M=d.months;
-  renderBars(brand+'-bars',M,d.alcance,C);
-  renderTop3(brand+'-top3',d.top3,C);
-  renderTable(brand+'-table',d.rows);
+  const p=PFX[brand];
+  renderBars(p+'-bars',M,d.alcance,C);
+  renderTop3(p+'-top3',d.top3,C);
+  renderTable(p+'-table',d.rows);
   if(brand==='pizzerna'){
     renderBars('pz-reels-alc',M,d.reels_alc,'#3b82f6');
     renderBars('pz-car-alc',M,d.car_alc,'#7f77dd');
@@ -435,12 +438,13 @@ document.querySelectorAll('.dtab').forEach(btn=>{
     };
     const vals=(maps[brand]||{})[metric]||d.alcance;
     const titles={alcance:'Alcance por mes',er:'Engagement Rate % por mes',comp:'Compartidos por mes',guard:'Guardados por mes',segu:'Seguimientos / Seg. nuevos por mes'};
-    const titleEl=document.getElementById(brand+'-chart-title');
+    const p2=PFX[brand];
+    const titleEl=document.getElementById(p2+'-chart-title');
     if(titleEl)titleEl.textContent=titles[metric]||metric;
     // reset sibling tabs
     this.closest('.dtabs').querySelectorAll('.dtab').forEach(t=>{t.style.color='';t.style.borderColor='';});
     this.style.color=C;this.style.borderColor=C+'66';
-    renderBars(brand+'-bars',M,vals,C);
+    renderBars(p2+'-bars',M,vals,C);
   });
 });
 
