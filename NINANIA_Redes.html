@@ -46,6 +46,12 @@ a{color:inherit}
 .drag-handle:active{cursor:grabbing}
 .section.dragging{opacity:.4;border-color:#be185d!important}
 .section.drag-over{border-top:2px solid #be185d}
+
+.fmt{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;padding:1px 7px;border-radius:3px;letter-spacing:.04em;white-space:nowrap}
+.fmt-reel{background:#eff6ff;color:#2563eb}
+.fmt-car{background:#f5f3ff;color:#7c3aed}
+.fmt-foto{background:#f0fdf4;color:#16a34a}
+.fmt-mix{background:#fffbeb;color:#d97706}
 .layout-reset{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa;background:transparent;border:1px solid #dddad4;border-radius:4px;padding:2px 8px;cursor:pointer;transition:all .15s;margin-bottom:12px}
 .layout-reset:hover{color:#333;border-color:#888}
 .dtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
@@ -286,13 +292,13 @@ var D = {
       {d:'Men\u00fa completo \u2014 Bowls, carnes, pastas, Fitzzerna',t:'Reel',a:36313,c:328,g:71,s:399,m:'Oct 25',u:'https://www.instagram.com/reel/DQccZmFkRKg/'}
     ],
     rows: [
-      ['Oct 25',15,'11R·4C','156K',1609,552,637,'4.24%'],
-      ['Nov 25',14,'11R·3C','180K',975,355,380,'2.64%'],
-      ['Dic 25',16,'12R·4C','189K',2001,787,230,'4.41%','hl'],
-      ['Ene 26',11,'8R·3C','122K',1245,256,190,'6.05%'],
-      ['Feb 26',12,'10R·2C','84K',1133,165,43,'4.99%'],
-      ['Mar 26',14,'11R·3C','103K',1271,242,122,'5.83%'],
-      ['Abr 26',15,'12R·3C','94K',1344,225,128,'5.76%']
+      ['Oct 25',15,'Mixto','156K',1609,552,637,'4.24%'],
+      ['Nov 25',14,'Mixto','180K',975,355,380,'2.64%'],
+      ['Dic 25',16,'Mixto','189K',2001,787,230,'4.41%','hl'],
+      ['Ene 26',11,'Mixto','122K',1245,256,190,'6.05%'],
+      ['Feb 26',12,'Mixto','84K',1133,165,43,'4.99%'],
+      ['Mar 26',14,'Mixto','103K',1271,242,122,'5.83%'],
+      ['Abr 26',15,'Mixto','94K',1344,225,128,'5.76%']
     ]
   },
   co: {
@@ -368,18 +374,18 @@ var D = {
       {d:'PEPPER BURGER @coliseo.sportsbar / #burgermaster',t:'Reel',a:54598,c:1371,g:125,s:1496,m:'Abr 26',u:'https://www.instagram.com/reel/DXXygPxDQAu/'}
     ],
     rows: [
-      ['Ene 25',1,'1F',    '9K',5,5,0,'2.76%'],
-      ['Feb 25',2,'1F·1C', '14K',2,8,0,'4.26%'],
-      ['Jun 25',1,'1F',    '6K',3,5,62,'3.72%'],
-      ['Jul 25',1,'1C',    '5K',1,6,73,'4.48%'],
-      ['Sep 25',2,'1R·1C', '37K',143,29,544,'2.80%'],
-      ['Oct 25',3,'3R',    '205K',5063,833,1881,'6.77%','hl'],
-      ['Nov 25',9,'8R·1C', '146K',455,162,1205,'4.99%'],
-      ['Dic 25',13,'11R·2C','232K',2037,452,1696,'5.43%'],
-      ['Ene 26',10,'10R',  '123K',1169,266,1066,'5.98%'],
-      ['Feb 26',15,'13R·2C','156K',1009,346,1209,'6.71%'],
-      ['Mar 26',14,'12R·2C','232K',2866,838,1862,'6.88%'],
-      ['Abr 26',16,'15R·1C','316K',6078,823,2158,'7.52%','hl']
+      ['Ene 25',1,'Foto / Flyer',    '9K',5,5,0,'2.76%'],
+      ['Feb 25',2,'Mixto', '14K',2,8,0,'4.26%'],
+      ['Jun 25',1,'Foto / Flyer',    '6K',3,5,62,'3.72%'],
+      ['Jul 25',1,'Carrusel',    '5K',1,6,73,'4.48%'],
+      ['Sep 25',2,'Mixto', '37K',143,29,544,'2.80%'],
+      ['Oct 25',3,'Reel',    '205K',5063,833,1881,'6.77%','hl'],
+      ['Nov 25',9,'Mixto', '146K',455,162,1205,'4.99%'],
+      ['Dic 25',13,'Mixto','232K',2037,452,1696,'5.43%'],
+      ['Ene 26',10,'Reel',  '123K',1169,266,1066,'5.98%'],
+      ['Feb 26',15,'Mixto','156K',1009,346,1209,'6.71%'],
+      ['Mar 26',14,'Mixto','232K',2866,838,1862,'6.88%'],
+      ['Abr 26',16,'Mixto','316K',6078,823,2158,'7.52%','hl']
     ]
   }
 };
@@ -438,16 +444,32 @@ function drawTop3(elId, items, color){
   el.innerHTML = html;
 }
 
+function fmtBadge(v){
+  if(!v || v==='—') return '<td style="color:#ccc">—</td>';
+  var cls = v==='Reel' ? 'fmt-reel' : v==='Carrusel' ? 'fmt-car' : v==='Foto / Flyer' ? 'fmt-foto' : 'fmt-mix';
+  return '<td><span class="fmt '+cls+'">'+v+'</span></td>';
+}
 function drawTable(elId, rows){
   var tb = document.getElementById(elId);
   if(!tb){console.warn('drawTable: element not found',elId);return;}
+  var fmtVals = ['Reel','Carrusel','Foto / Flyer','Mixto'];
   var html = '';
   for(var i=0;i<rows.length;i++){
     var r = rows[i];
     var last = r[r.length-1];
     var cls = last==='hl' ? 'hl' : last==='zero' ? 'zero' : '';
     var cells = r.filter(function(c){return c!=='hl' && c!=='zero';});
-    html += '<tr class="'+cls+'">'+cells.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';
+    var row = '<tr class="'+cls+'">';
+    for(var j=0;j<cells.length;j++){
+      var c = cells[j];
+      if(j===2 && fmtVals.indexOf(c)>=0){
+        row += fmtBadge(c);
+      } else {
+        row += '<td>'+c+'</td>';
+      }
+    }
+    row += '</tr>';
+    html += row;
   }
   tb.innerHTML = html;
 }
