@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NINANIA — Centro de Comando</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#07090e;--s1:#0d1018;--s2:#131720;--s3:#191f2a;
+  --b1:#1c2233;--b2:#263045;--b3:#334060;
+  --tx:#dde4f2;--tx2:#8898b8;--tx3:#445068;
+  --red:#f03e3e;--red2:#2d1010;--red3:#6b1a1a;
+  --amb:#f59e0b;--amb2:#271c04;--amb3:#6b4508;
+  --grn:#22c55e;--grn2:#0a1f14;--grn3:#135a2a;
+  --blu:#3b82f6;--blu2:#0b1c38;--blu3:#173568;
+  --pk:#D4537E;--pk2:#2a0d19;--pk3:#6b1a3a;
+  --teal:#1D9E75;--teal2:#071a13;--teal3:#0f4a30;
+  --co:#D85A30;--co2:#2a1008;--co3:#6b2810;
+  --accent:#e8c84a;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --r:8px;--r2:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--sans);background:var(--bg);color:var(--tx);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:40px 24px;
+}
+
+.header{text-align:center;margin-bottom:64px}
+.eyebrow{font-family:var(--mono);font-size:11px;color:var(--tx3);letter-spacing:.25em;text-transform:uppercase;margin-bottom:10px}
+.brand-name{font-family:var(--mono);font-size:48px;font-weight:600;color:var(--accent);letter-spacing:.08em;line-height:1;margin-bottom:12px}
+.brand-sub{font-size:15px;color:var(--tx2);font-weight:300;letter-spacing:.02em}
+.brand-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:20px auto 0}
+.hub-date{font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:.15em;margin-top:10px}
+
+.modules{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:980px;width:100%}
+
+.mod-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);
+  padding:28px 24px;text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.mod-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.mod-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r2) var(--r2) 0 0}
+.mod-glow{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+
+/* colores por módulo */
+.mod-card.redes::before{background:linear-gradient(90deg,var(--pk),#e879a0)}
+.mod-card.redes:hover{border-color:var(--pk3)}
+.mod-card.redes .mod-glow{background:radial-gradient(ellipse at 0% 0%,rgba(212,83,126,.1) 0%,transparent 65%)}
+.mod-card.redes .mod-icon,.mod-card.redes .mod-cta{color:var(--pk)}
+
+.mod-card.rev::before{background:linear-gradient(90deg,var(--accent),var(--amb))}
+.mod-card.rev:hover{border-color:var(--amb3)}
+.mod-card.rev .mod-glow{background:radial-gradient(ellipse at 0% 0%,rgba(232,200,74,.08) 0%,transparent 65%)}
+.mod-card.rev .mod-icon,.mod-card.rev .mod-cta{color:var(--accent)}
+
+.mod-card.bajas::before{background:linear-gradient(90deg,var(--amb),#f97316)}
+.mod-card.bajas:hover{border-color:var(--amb3)}
+.mod-card.bajas .mod-glow{background:radial-gradient(ellipse at 0% 0%,rgba(245,158,11,.08) 0%,transparent 65%)}
+.mod-card.bajas .mod-icon,.mod-card.bajas .mod-cta{color:var(--amb)}
+
+.mod-card.ventas::before{background:linear-gradient(90deg,var(--teal),#22c55e)}
+.mod-card.ventas:hover{border-color:var(--teal3)}
+.mod-card.ventas .mod-glow{background:radial-gradient(ellipse at 0% 0%,rgba(29,158,117,.08) 0%,transparent 65%)}
+.mod-card.ventas .mod-icon,.mod-card.ventas .mod-cta{color:var(--teal)}
+
+.mod-card.costos::before{background:linear-gradient(90deg,var(--blu),#60a5fa)}
+.mod-card.costos:hover{border-color:var(--blu3)}
+.mod-card.costos .mod-glow{background:radial-gradient(ellipse at 0% 0%,rgba(59,130,246,.08) 0%,transparent 65%)}
+.mod-card.costos .mod-icon,.mod-card.costos .mod-cta{color:var(--blu)}
+
+.mod-card.cot::before{background:linear-gradient(90deg,var(--co),#f97316)}
+.mod-card.cot:hover{border-color:var(--co3)}
+.mod-card.cot .mod-glow{background:radial-gradient(ellipse at 0% 0%,rgba(216,90,48,.08) 0%,transparent 65%)}
+.mod-card.cot .mod-icon,.mod-card.cot .mod-cta{color:var(--co)}
+
+.mod-icon{font-family:var(--mono);font-size:24px;font-weight:600;margin-bottom:16px;line-height:1}
+.mod-title{font-size:17px;font-weight:600;margin-bottom:6px;letter-spacing:-.01em}
+.mod-file{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px}
+.mod-desc{font-size:11.5px;color:var(--tx2);line-height:1.65;margin-bottom:20px;flex:1}
+.mod-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px}
+.mod-tag{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:2px;letter-spacing:.1em;border:1px solid transparent}
+.tag-amb{background:var(--amb2);color:var(--amb);border-color:var(--amb3)}
+.tag-blu{background:var(--blu2);color:#60a5fa;border-color:var(--blu3)}
+.tag-red{background:var(--red2);color:#f87171;border-color:var(--red3)}
+.tag-grn{background:var(--grn2);color:#86efac;border-color:var(--grn3)}
+.tag-acc{background:rgba(232,200,74,.12);color:var(--accent);border-color:rgba(232,200,74,.25)}
+.tag-pk{background:var(--pk2);color:#e879a0;border-color:var(--pk3)}
+.tag-teal{background:var(--teal2);color:#4ade80;border-color:var(--teal3)}
+.tag-co{background:var(--co2);color:#f97316;border-color:var(--co3)}
+
+.mod-cta{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--b1);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em}
+.mod-arrow{font-size:16px;transition:transform .2s}
+.mod-card:hover .mod-arrow{transform:translateX(5px)}
+.mod-status{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:2px;font-weight:600;letter-spacing:.1em;border:1px solid transparent}
+.status-ready{background:var(--grn2);color:var(--grn);border-color:var(--grn3)}
+.status-dev{background:var(--s3);color:var(--tx3);border-color:var(--b2)}
+.status-soon{background:var(--s2);color:var(--tx3);border-color:var(--b1)}
+
+.footer{margin-top:56px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:.08em}
+.footer span{color:var(--b3)}
+
+@media(max-width:800px){.modules{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.modules{grid-template-columns:1fr}.brand-name{font-size:36px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">Centro de Comando</div>
+  <div class="brand-name">NINANIA</div>
+  <div class="brand-sub">Selecciona el módulo que deseas operar</div>
+  <div class="brand-line"></div>
+  <div class="hub-date" id="hub-date"></div>
+</div>
+
+<div class="modules">
+
+  <!-- REDES SOCIALES -->
+  <a class="mod-card redes" href="NINANIA_Redes.html">
+    <div class="mod-glow"></div>
+    <div class="mod-icon">◈</div>
+    <div class="mod-title">Redes Sociales</div>
+    <div class="mod-file">NINANIA_Redes.html</div>
+    <div class="mod-desc">Dashboards de rendimiento para las 4 marcas del grupo. Alcance, engagement, crecimiento de seguidores y top posts por marca.</div>
+    <div class="mod-tags">
+      <span class="mod-tag tag-pk">PIZZERNA</span>
+      <span class="mod-tag tag-amb">COLISEO</span>
+      <span class="mod-tag tag-pk">DULCERNA</span>
+      <span class="mod-tag tag-co">BERNARDO</span>
+    </div>
+    <div class="mod-cta">
+      <span class="mod-status status-ready">ACTIVO</span>
+      <span class="mod-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- REVERSIONES -->
+  <a class="mod-card rev" href="NINANIA_Reversiones.html">
+    <div class="mod-glow"></div>
+    <div class="mod-icon">⟲</div>
+    <div class="mod-title">Reversiones</div>
+    <div class="mod-file">NINANIA_Reversiones.html</div>
+    <div class="mod-desc">Auditoría de anulaciones en el punto de venta. Detecta fraude sistemático, auto-reversiones y patrones por empleado y turno.</div>
+    <div class="mod-tags">
+      <span class="mod-tag tag-acc">ANULACIONES POS</span>
+      <span class="mod-tag tag-red">FRAUDE CRÍTICO</span>
+      <span class="mod-tag tag-blu">RANKING EMPLEADOS</span>
+    </div>
+    <div class="mod-cta">
+      <span class="mod-status status-ready">ACTIVO</span>
+      <span class="mod-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- BAJAS & MERMAS -->
+  <a class="mod-card bajas" href="NINANIA_Bajas.html">
+    <div class="mod-glow"></div>
+    <div class="mod-icon">↓</div>
+    <div class="mod-title">Bajas & Mermas</div>
+    <div class="mod-file">NINANIA_Bajas.html</div>
+    <div class="mod-desc">Control de productos dados de baja por calidad, vencimiento o consumo interno no autorizado. Detecta patrones por empleado, turno y producto.</div>
+    <div class="mod-tags">
+      <span class="mod-tag tag-amb">BAJAS CALIDAD</span>
+      <span class="mod-tag tag-red">MERMA TURNO</span>
+      <span class="mod-tag tag-grn">INVENTARIO</span>
+    </div>
+    <div class="mod-cta">
+      <span class="mod-status status-dev">EN DESARROLLO</span>
+      <span class="mod-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- VENTAS -->
+  <a class="mod-card ventas" href="NINANIA_Ventas.html">
+    <div class="mod-glow"></div>
+    <div class="mod-icon">$</div>
+    <div class="mod-title">Ventas</div>
+    <div class="mod-file">NINANIA_Ventas.html</div>
+    <div class="mod-desc">Dashboard de ventas por sede, producto y período. Comparativas semanales, alertas de desviación y análisis de tendencias por canal.</div>
+    <div class="mod-tags">
+      <span class="mod-tag tag-teal">POR SEDE</span>
+      <span class="mod-tag tag-teal">POR PRODUCTO</span>
+      <span class="mod-tag tag-grn">TENDENCIAS</span>
+    </div>
+    <div class="mod-cta">
+      <span class="mod-status status-soon">PRÓXIMAMENTE</span>
+      <span class="mod-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- COSTOS -->
+  <a class="mod-card costos" href="NINANIA_Costos.html">
+    <div class="mod-glow"></div>
+    <div class="mod-icon">%</div>
+    <div class="mod-title">Costos</div>
+    <div class="mod-file">NINANIA_Costos.html</div>
+    <div class="mod-desc">Estructura de costos por producto, receta y sede. Márgenes, desviaciones y alertas de rentabilidad integradas con inventario y ventas.</div>
+    <div class="mod-tags">
+      <span class="mod-tag tag-blu">MÁRGENES</span>
+      <span class="mod-tag tag-blu">RECETAS</span>
+      <span class="mod-tag tag-red">ALERTAS</span>
+    </div>
+    <div class="mod-cta">
+      <span class="mod-status status-soon">PRÓXIMAMENTE</span>
+      <span class="mod-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- COTIZADORES -->
+  <a class="mod-card cot" href="NINANIA_Cotizadores.html">
+    <div class="mod-glow"></div>
+    <div class="mod-icon">≡</div>
+    <div class="mod-title">Cotizadores</div>
+    <div class="mod-file">NINANIA_Cotizadores.html</div>
+    <div class="mod-desc">Cotizadores virtuales para eventos, catering y servicios de las marcas del grupo. Generación automática de propuestas y presupuestos.</div>
+    <div class="mod-tags">
+      <span class="mod-tag tag-co">EVENTOS</span>
+      <span class="mod-tag tag-co">CATERING</span>
+      <span class="mod-tag tag-amb">PROPUESTAS</span>
+    </div>
+    <div class="mod-cta">
+      <span class="mod-status status-soon">PRÓXIMAMENTE</span>
+      <span class="mod-arrow">→</span>
+    </div>
+  </a>
+
+</div>
+
+<div class="footer">
+  NINANIA <span>·</span> Centro de Comando <span>·</span> CONFIDENCIAL — USO EXCLUSIVO GERENCIA
+</div>
+
+<script>
+const d = new Date();
+const M = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+document.getElementById('hub-date').textContent = d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();
+</script>
+</body>
+</html>

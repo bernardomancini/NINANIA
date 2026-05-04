@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NINANIA — Redes Sociales</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#07090e;--s1:#0d1018;--s2:#131720;--s3:#191f2a;
+  --b1:#1c2233;--b2:#263045;--b3:#334060;
+  --tx:#dde4f2;--tx2:#8898b8;--tx3:#445068;
+  --red:#f03e3e;--red2:#2d1010;--red3:#6b1a1a;
+  --amb:#f59e0b;--amb2:#271c04;--amb3:#6b4508;
+  --grn:#22c55e;--grn2:#0a1f14;--grn3:#135a2a;
+  --blu:#3b82f6;--blu2:#0b1c38;--blu3:#173568;
+  --pk:#D4537E;--pk2:#2a0d19;--pk3:#6b1a3a;
+  --teal:#1D9E75;--teal2:#071a13;--teal3:#0f4a30;
+  --co:#D85A30;--co2:#2a1008;--co3:#6b2810;
+  --accent:#e8c84a;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --r:8px;--r2:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh}
+
+.topbar{position:sticky;top:0;z-index:100;background:rgba(7,9,14,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;padding:0 20px;height:54px}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--tx3);font-family:var(--mono);font-size:11px;letter-spacing:.1em;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:5px 12px;text-decoration:none;transition:all .2s;flex-shrink:0}
+.back-btn:hover{color:var(--accent);border-color:var(--amb3)}
+.topbar-title{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--tx2);letter-spacing:.08em}
+.topbar-brand{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--pk);margin-left:auto}
+.topbar-file{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.08em;margin-left:8px}
+
+.body{padding:24px;max-width:1200px;margin:0 auto}
+
+.brand-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.brand-tab{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;padding:7px 16px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--tx3);cursor:pointer;transition:all .2s;text-transform:uppercase}
+.brand-tab:hover{border-color:var(--b3);color:var(--tx2)}
+.brand-tab.act-pz{background:var(--blu2);color:var(--blu);border-color:var(--blu3)}
+.brand-tab.act-co{background:var(--amb2);color:var(--amb);border-color:var(--amb3)}
+.brand-tab.act-dul{background:var(--pk2);color:#e879a0;border-color:var(--pk3)}
+.brand-tab.act-berna{background:var(--co2);color:var(--co);border-color:var(--co3)}
+
+.brand-dash{display:none}.brand-dash.active{display:block}
+
+.dash-header{margin-bottom:20px}
+.dash-name{font-size:22px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.dash-meta{font-size:12px;color:var(--tx3);font-family:var(--mono)}
+.dash-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dbadge{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
+.bg{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3)}
+.bb{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3)}
+.ba{background:var(--amb2);color:var(--amb);border:1px solid var(--amb3)}
+.bp{background:var(--pk2);color:#e879a0;border:1px solid var(--pk3)}
+.bc{background:var(--co2);color:var(--co);border:1px solid var(--co3)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:24px}
+.kpi{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px 14px}
+.kpi-label{font-size:10px;color:var(--tx3);font-family:var(--mono);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.kpi-val{font-size:20px;font-weight:700;color:var(--tx);line-height:1.1}
+.kpi-sub{font-size:10px;color:var(--tx3);margin-top:3px}
+
+.dtabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.dtab{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--tx3);cursor:pointer;font-family:var(--mono);transition:all .15s}
+.dtab:hover{color:var(--tx2);border-color:var(--b3)}
+
+.chart-sec{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:16px;margin-bottom:16px}
+.chart-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-family:var(--mono);margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-lbl{font-size:10px;color:var(--tx2);width:52px;flex-shrink:0;text-align:right;font-family:var(--mono)}
+.bar-track{flex:1;background:var(--s3);border-radius:3px;height:18px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px}
+.bar-fill span{font-size:9px;font-weight:700;color:rgba(255,255,255,.9);white-space:nowrap}
+
+.top3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:8px}
+.t3-card{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px}
+.t3-score{font-size:18px;font-weight:700;font-family:var(--mono)}
+.t3-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;font-family:var(--mono);letter-spacing:.08em}
+.t3-title{font-size:11.5px;font-weight:600;color:var(--tx);margin:6px 0 4px;line-height:1.4}
+.t3-meta{font-size:10px;color:var(--tx3)}
+.t3-link{font-size:10px;text-decoration:none;display:inline-block;margin-top:4px;font-family:var(--mono)}
+
+.sum-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px}
+.sum-table th{text-align:left;color:var(--tx3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--b1);font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase}
+.sum-table td{padding:6px 8px;border-bottom:1px solid var(--b2);color:var(--tx2)}
+.sum-table tr:last-child td{border-bottom:none}
+.sum-table tr.hl td{background:var(--s2)}
+.sum-table tr.zero td{color:var(--tx3)}
+
+.viral-box{border-radius:10px;padding:14px;margin-bottom:16px}
+.insight-card{border-left:3px solid;padding:10px 14px;margin-bottom:8px}
+.ins-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;font-family:var(--mono)}
+.ins-txt{font-size:11.5px;line-height:1.6;color:var(--tx2)}
+.i-grn{background:rgba(34,197,94,.06);border-color:var(--grn)}
+.i-amb{background:rgba(245,158,11,.06);border-color:var(--amb)}
+.i-blu{background:rgba(59,130,246,.06);border-color:var(--blu)}
+.i-red{background:rgba(240,62,62,.06);border-color:var(--red)}
+.i-pu{background:rgba(127,119,221,.06);border-color:#7f77dd}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.timeline{border-left:2px solid var(--co3);padding-left:14px}
+.tl-item{margin-bottom:12px}
+.tl-date{font-family:var(--mono);font-size:10px;letter-spacing:.06em;margin-bottom:3px}
+.tl-text{font-size:11.5px;color:var(--tx2)}
+
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="NINANIA_Hub.html">← HUB</a>
+  <div class="topbar-title">REDES SOCIALES</div>
+  <div class="topbar-brand" id="topbar-brand">—</div>
+  <div class="topbar-file">NINANIA_Redes.html</div>
+</div>
+
+<div class="body">
+  <div class="brand-tabs">
+    <button class="brand-tab" data-brand="pizzerna" data-cls="act-pz">Pizzerna</button>
+    <button class="brand-tab" data-brand="coliseo"  data-cls="act-co">Coliseo</button>
+    <button class="brand-tab" data-brand="dulcerna" data-cls="act-dul">Dulcerna</button>
+    <button class="brand-tab" data-brand="berna"    data-cls="act-berna">Bernardo Mancini</button>
+  </div>
+
+  <!-- PIZZERNA -->
+  <div class="brand-dash" id="dash-pizzerna">
+    <div class="dash-header">
+      <div class="dash-name">Pizzerna</div>
+      <div class="dash-meta">Oct 2025 – Abr 2026 · 97 posts · Instagram</div>
+      <div class="dash-badges">
+        <span class="dbadge bg">Seguimientos: Superior</span>
+        <span class="dbadge bg">Engagement: Superior</span>
+        <span class="dbadge bb">ER% promedio: 4.88%</span>
+        <span class="dbadge bg">22,700 seguidores · +124% anual</span>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Visualizaciones</div><div class="kpi-val">2,0M</div></div>
+      <div class="kpi"><div class="kpi-label">Alcance total</div><div class="kpi-val">929K</div></div>
+      <div class="kpi"><div class="kpi-label">Me gusta</div><div class="kpi-val">29,5K</div></div>
+      <div class="kpi"><div class="kpi-label">Compartidos</div><div class="kpi-val">9,578</div></div>
+      <div class="kpi"><div class="kpi-label">Guardados</div><div class="kpi-val">2,582</div></div>
+      <div class="kpi"><div class="kpi-label">Seguidores hoy</div><div class="kpi-val">22,700</div><div class="kpi-sub">+124% anual</div></div>
+    </div>
+    <div class="dtabs" id="pz-dtabs">
+      <button class="dtab" data-brand="pizzerna" data-metric="alcance" style="color:var(--blu);border-color:var(--blu3)">Alcance</button>
+      <button class="dtab" data-brand="pizzerna" data-metric="er">ER%</button>
+      <button class="dtab" data-brand="pizzerna" data-metric="comp">Compartidos</button>
+      <button class="dtab" data-brand="pizzerna" data-metric="guard">Guardados</button>
+      <button class="dtab" data-brand="pizzerna" data-metric="segu">Seguimientos</button>
+    </div>
+    <div class="chart-sec"><div class="chart-title" id="pz-chart-title">Alcance por mes</div><div id="pz-bars"></div></div>
+    <div class="two-col">
+      <div class="chart-sec"><div class="chart-title">Reels — Alcance</div><div id="pz-reels-alc"></div></div>
+      <div class="chart-sec"><div class="chart-title">Carruseles — Alcance</div><div id="pz-car-alc"></div></div>
+    </div>
+    <div class="chart-sec"><div class="chart-title">Top 3 posts (Guardados + Compartidos)</div><div class="top3-grid" id="pz-top3"></div></div>
+    <div class="chart-sec"><div class="chart-title">Resumen mensual</div>
+      <div style="overflow-x:auto"><table class="sum-table"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Compartidos</th><th>Guardados</th><th>Seguim.</th><th>ER%</th></tr></thead><tbody id="pz-table"></tbody></table></div>
+    </div>
+    <div class="chart-sec"><div class="chart-title">Insights para el equipo</div>
+      <div class="insight-card i-blu"><div class="ins-lbl" style="color:#60a5fa">Formato</div><div class="ins-txt">Los Reels generan el 93% del alcance. Un Reel promedio alcanza 11,826 personas vs 1,933 de un carrusel. Reels para llegar a nuevas personas, carruseles para contenido guardable (menú, info, procesos).</div></div>
+      <div class="insight-card i-grn"><div class="ins-lbl" style="color:var(--grn)">Contenido ganador</div><div class="ins-txt">Reviews reales (Gia, clientes) y colabs con @bernardomancini generan 3x más compartidos. El Dubai Sándwich (702 comp.) y el review de GIA (513 comp.) son los mejores ejemplos.</div></div>
+      <div class="insight-card i-amb"><div class="ins-lbl" style="color:var(--amb)">Tendencia 2026</div><div class="ins-txt">Abr 2026: interacciones más altas del período (13,494). Se necesita contenido que salga del círculo de seguidores — un Reel viral por mes mínimo.</div></div>
+      <div class="insight-card i-red"><div class="ins-lbl" style="color:#f87171">Alerta — clics en enlace</div><div class="ins-txt">Los clics en el bio cayeron de 4,376 (Dic 25) a 32 (Abr 26) — caída del 99%. Revisar link en bio y agregar CTA explícita en al menos 2 posts por semana.</div></div>
+    </div>
+  </div>
+
+  <!-- COLISEO -->
+  <div class="brand-dash" id="dash-coliseo">
+    <div class="dash-header">
+      <div class="dash-name">Coliseo Sports Bar</div>
+      <div class="dash-meta">Ene 2025 – Abr 2026 · 139 posts · Instagram</div>
+      <div class="dash-badges">
+        <span class="dbadge bg">Superior en todas las categorías vs promedio</span>
+        <span class="dbadge ba">2° mejor post del grupo — score 1,861</span>
+        <span class="dbadge bg">55,478 seguidores</span>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Visualizaciones</div><div class="kpi-val">1,97M</div></div>
+      <div class="kpi"><div class="kpi-label">Alcance total</div><div class="kpi-val">1,41M</div></div>
+      <div class="kpi"><div class="kpi-label">Me gusta</div><div class="kpi-val">57,5K</div></div>
+      <div class="kpi"><div class="kpi-label">Compartidos</div><div class="kpi-val">11,676</div></div>
+      <div class="kpi"><div class="kpi-label">Guardados</div><div class="kpi-val">1,983</div></div>
+      <div class="kpi"><div class="kpi-label">Seguidores hoy</div><div class="kpi-val">55,478</div><div class="kpi-sub">+10.7% en 7 meses</div></div>
+    </div>
+    <div class="dtabs">
+      <button class="dtab" data-brand="coliseo" data-metric="alcance" style="color:var(--amb);border-color:var(--amb3)">Alcance</button>
+      <button class="dtab" data-brand="coliseo" data-metric="er">ER%</button>
+      <button class="dtab" data-brand="coliseo" data-metric="comp">Compartidos</button>
+      <button class="dtab" data-brand="coliseo" data-metric="segu">Seg. nuevos</button>
+    </div>
+    <div class="chart-sec"><div class="chart-title" id="co-chart-title">Alcance por mes</div><div id="co-bars"></div></div>
+    <div class="chart-sec"><div class="chart-title">Top 3 posts históricos</div><div class="top3-grid" id="co-top3"></div></div>
+    <div class="chart-sec"><div class="chart-title">Resumen mensual</div>
+      <div style="overflow-x:auto"><table class="sum-table"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Compartidos</th><th>Guardados</th><th>Seguim.</th><th>ER%</th></tr></thead><tbody id="co-table"></tbody></table></div>
+    </div>
+    <div class="chart-sec"><div class="chart-title">Insights para el equipo</div>
+      <div class="insight-card i-grn"><div class="ins-lbl" style="color:var(--grn)">Motor viral #1 — Junior FC</div><div class="ins-txt">Dic 2025 (Junior campeón): 261K alcance, ER 11.36%. La "abuela de la suerte" fue el mejor post (102K alcance, 1,563 comp). Los momentos reales del público en el bar son 10x más efectivos que contenido de producto.</div></div>
+      <div class="insight-card i-amb"><div class="ins-lbl" style="color:var(--amb)">Motor viral #2 — Burger Master</div><div class="ins-txt">Abr 2025 (The GOAT 181K) y Abr 2026 (Pepper Burger 183K). Evento anual predecible. Para 2027: documentar el proceso desde semanas antes para alargar el contenido.</div></div>
+      <div class="insight-card i-blu"><div class="ins-lbl" style="color:var(--blu)">Motor viral #3 — Cultura pop</div><div class="ins-txt">Jun 2025: La Casa de los Famosos generó ER 9.04% con solo 5 posts. Hannah Montana, F1, Miss Universo, Yina vs. Valdiri — 1 evento de cultura pop por mes llena el vacío entre temporadas de fútbol.</div></div>
+      <div class="insight-card i-red"><div class="ins-lbl" style="color:#f87171">Publicar menos pero mejor</div><div class="ins-txt">349 posts en 28 días. toppingburgers_ tiene 109K seguidores con 131 posts. Priorizar 3–4 Reels semanales de alto impacto en vez de postear diario con bajo alcance.</div></div>
+    </div>
+  </div>
+
+  <!-- DULCERNA -->
+  <div class="brand-dash" id="dash-dulcerna">
+    <div class="dash-header">
+      <div class="dash-name">Dulcerna</div>
+      <div class="dash-meta">Ene 2025 – Abr 2026 · 180 posts · Instagram · la marca más grande del grupo</div>
+      <div class="dash-badges">
+        <span class="dbadge bg">+12,316 seguidores en 12 meses</span>
+        <span class="dbadge bp">Score 11,020 — mejor post de todo el grupo</span>
+        <span class="dbadge bb">Mayo 25: mayor alcance del año (398K)</span>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Visualizaciones</div><div class="kpi-val">2,89M</div></div>
+      <div class="kpi"><div class="kpi-label">Alcance (posts)</div><div class="kpi-val">2,36M</div></div>
+      <div class="kpi"><div class="kpi-label">Alcance cuenta</div><div class="kpi-val">3,32M</div></div>
+      <div class="kpi"><div class="kpi-label">Compartidos</div><div class="kpi-val">21,829</div></div>
+      <div class="kpi"><div class="kpi-label">Guardados</div><div class="kpi-val">8,901</div></div>
+      <div class="kpi"><div class="kpi-label">Seguidores hoy</div><div class="kpi-val">90,500</div><div class="kpi-sub">la más grande del grupo</div></div>
+    </div>
+    <div class="viral-box" style="background:rgba(212,83,126,.07);border:1px solid var(--pk3)">
+      <div style="font-family:var(--mono);font-size:10px;color:#e879a0;font-weight:700;margin-bottom:6px;letter-spacing:.08em">MEJOR POST DE TODO EL GRUPO — FEB 2026</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:6px">"Envíale este video a esa amiga con la que necesitas hacer este plan esta semana"</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+        <span style="color:var(--tx3)">228K alcance</span><span style="color:var(--tx3)">7,290 comp.</span><span style="color:var(--tx3)">3,730 guard.</span>
+        <span style="color:#e879a0;font-weight:700">score 11,020</span>
+      </div>
+      <a href="https://www.instagram.com/reel/DUT1mSxAQqL/" target="_blank" style="font-size:10px;color:#e879a0;text-decoration:none;display:inline-block;margin-top:8px;font-family:var(--mono)">Ver post →</a>
+    </div>
+    <div class="dtabs">
+      <button class="dtab" data-brand="dulcerna" data-metric="alcance" style="color:#e879a0;border-color:var(--pk3)">Alcance</button>
+      <button class="dtab" data-brand="dulcerna" data-metric="er">ER%</button>
+      <button class="dtab" data-brand="dulcerna" data-metric="comp">Compartidos</button>
+      <button class="dtab" data-brand="dulcerna" data-metric="guard">Guardados</button>
+      <button class="dtab" data-brand="dulcerna" data-metric="segu">Seg. nuevos</button>
+    </div>
+    <div class="chart-sec"><div class="chart-title" id="dul-chart-title">Alcance por mes</div><div id="dul-bars"></div></div>
+    <div class="chart-sec"><div class="chart-title">Top 3 posts históricos</div><div class="top3-grid" id="dul-top3"></div></div>
+    <div class="chart-sec"><div class="chart-title">Resumen mensual</div>
+      <div style="overflow-x:auto"><table class="sum-table"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Compartidos</th><th>Guardados</th><th>Seg. nuevos</th><th>ER%</th></tr></thead><tbody id="dul-table"></tbody></table></div>
+    </div>
+    <div class="chart-sec"><div class="chart-title">Insights para el equipo</div>
+      <div class="insight-card i-grn"><div class="ins-lbl" style="color:var(--grn)">"Envíale / Mándale este video" — fórmula #1</div><div class="ins-txt">Hook de reenvío + experiencia irresistible + CTA social implícito. Feb 26 (score 11,020), Abr 26 affogato (score 1,834), Abr 25 Nutella Affogato (score 2,761). Replicar mínimo 1 vez al mes.</div></div>
+      <div class="insight-card i-grn"><div class="ins-lbl" style="color:var(--grn)">Fechas especiales + celebridades</div><div class="ins-txt">Mayo 25: famoso en el mes de la madre = 398K alcance (el mayor del año). Las colabs con personalidades locales + fechas especiales son el segundo motor más potente.</div></div>
+      <div class="insight-card i-blu"><div class="ins-lbl" style="color:var(--blu)">Abril es el mes más poderoso del año</div><div class="ins-txt">Abr 25 (168K) y Abr 26 (245K). Semana Santa + eventos + bodas. El carrito de helados y el Nutella Affogato nacieron en abril. Planear el próximo lanzamiento viral para esta fecha.</div></div>
+      <div class="insight-card i-amb"><div class="ins-lbl" style="color:var(--amb)">El patrón viral → caída → recuperación</div><div class="ins-txt">Feb 26 (302K) → Mar 26 (60K) → Abr 26 (245K). La recuperación de Abr fue porque tenían el carrito preparado. Para los próximos virales: tener el "segundo gancho" listo antes del pico.</div></div>
+    </div>
+  </div>
+
+  <!-- BERNARDO -->
+  <div class="brand-dash" id="dash-berna">
+    <div class="dash-header">
+      <div class="dash-name">Bernardo Mancini</div>
+      <div class="dash-meta">Ene 2025 – Abr 2026 · 87 posts · Instagram · marca personal</div>
+      <div class="dash-badges">
+        <span class="dbadge bg">+170% crecimiento anual</span>
+        <span class="dbadge bc">Score 5,814 — 2° mejor post del grupo</span>
+        <span class="dbadge bb">Abr 2026: mejor mes de la historia</span>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Visualizaciones</div><div class="kpi-val">5,6M</div></div>
+      <div class="kpi"><div class="kpi-label">Alcance cuenta</div><div class="kpi-val">2,34M</div></div>
+      <div class="kpi"><div class="kpi-label">Interacciones</div><div class="kpi-val">138K</div></div>
+      <div class="kpi"><div class="kpi-label">Compartidos</div><div class="kpi-val">19,958</div></div>
+      <div class="kpi"><div class="kpi-label">Guardados</div><div class="kpi-val">4,213</div></div>
+      <div class="kpi"><div class="kpi-label">Seguidores hoy</div><div class="kpi-val">19,000</div><div class="kpi-sub">+170% en 12 meses</div></div>
+    </div>
+    <div class="viral-box" style="background:rgba(216,90,48,.07);border:1px solid var(--co3)">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--co);font-weight:700;margin-bottom:6px;letter-spacing:.08em">2° MEJOR POST DEL GRUPO — OCT 2025</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:6px">"Mucho pistacchio, mucha Nutella, mucho helado en la masa de la Pizza de la Buena"</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+        <span style="color:var(--tx3)">146K alcance</span><span style="color:var(--tx3)">5,004 comp.</span><span style="color:var(--tx3)">810 guard.</span>
+        <span style="color:var(--co);font-weight:700">score 5,814 · +2,281 seg.</span>
+      </div>
+      <a href="https://www.instagram.com/reel/DQNLY-VgVTM/" target="_blank" style="font-size:10px;color:var(--co);text-decoration:none;display:inline-block;margin-top:8px;font-family:var(--mono)">Ver post →</a>
+    </div>
+    <div class="chart-sec">
+      <div class="chart-title">Transformación de la cuenta</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-date" style="color:var(--tx3)">ENE – SEP 2025</div><div class="tl-text">Contenido personal (familia, viajes). 1–2 posts/mes. Sin estrategia de negocio. Crecimiento mínimo.</div></div>
+        <div class="tl-item"><div class="tl-date" style="color:var(--co)">OCT 2025 — PUNTO DE QUIEBRE</div><div class="tl-text">3 Reels de pizza → 204K alcance. El viral de la pizza genera +2,281 seguidores en un solo post. La cuenta descubre su nicho real.</div></div>
+        <div class="tl-item"><div class="tl-date" style="color:var(--co)">NOV 2025 – ABR 2026</div><div class="tl-text">Bernardo como figura pública del grupo. Gastronomía + emprendimiento + colabs. Abr 2026: 315K alcance, ER 7.52%, mejor mes de la historia.</div></div>
+      </div>
+    </div>
+    <div class="dtabs">
+      <button class="dtab" data-brand="berna" data-metric="alcance" style="color:var(--co);border-color:var(--co3)">Alcance cuenta</button>
+      <button class="dtab" data-brand="berna" data-metric="er">ER%</button>
+      <button class="dtab" data-brand="berna" data-metric="comp">Compartidos</button>
+      <button class="dtab" data-brand="berna" data-metric="segu">Seg. nuevos</button>
+    </div>
+    <div class="chart-sec"><div class="chart-title" id="berna-chart-title">Alcance cuenta por mes</div><div id="berna-bars"></div></div>
+    <div class="chart-sec"><div class="chart-title">Top posts — desde Oct 2025</div><div class="top3-grid" id="berna-top3"></div></div>
+    <div class="chart-sec"><div class="chart-title">Resumen mensual</div>
+      <div style="overflow-x:auto"><table class="sum-table"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Compartidos</th><th>Guardados</th><th>Seg. nuevos</th><th>ER%</th></tr></thead><tbody id="berna-table"></tbody></table></div>
+    </div>
+    <div class="chart-sec"><div class="chart-title">Insights estratégicos</div>
+      <div class="insight-card i-grn"><div class="ins-lbl" style="color:var(--grn)">El amplificador más potente del grupo</div><div class="ins-txt">La Pepper Burger en su cuenta (score 1,496) superó el mismo post en Coliseo (score 961). Cuando Bernardo promueve un producto del grupo el alcance se multiplica.</div></div>
+      <div class="insight-card i-amb"><div class="ins-lbl" style="color:var(--amb)">Reviews gastronómicos = el formato más compartido</div><div class="ins-txt">NYC Golden Diner (score 357), Ceres NYC (score 678), pizza viral (score 5,814). La gente los reenvía como recomendaciones. Este es el activo editorial más valioso de la cuenta.</div></div>
+      <div class="insight-card i-blu"><div class="ins-lbl" style="color:var(--blu)">Colabs con figuras locales = palanca de crecimiento</div><div class="ins-txt">Andrés Bilbao (score 610, +566 seg.), dr.javierdiago (score 697). 2 colabs mensuales con perfiles de 10K–50K en Barranquilla es la estrategia más predecible para llegar a 30K.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const DATA = {
+  pizzerna:{
+    months:['Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26'],
+    alcance:[156493,179686,189405,122077,84452,103429,94243],
+    er:[4.24,2.64,4.41,6.05,4.99,5.83,5.76],
+    comp:[1609,975,2001,1245,1133,1271,1344],
+    guard:[552,355,787,256,165,242,225],
+    segu:[637,380,230,190,43,122,128],
+    reels_alc:[141636,165414,136425,117387,63181,101725,88534],
+    car_alc:[14857,14272,27933,4690,21271,1704,5709],
+    top3:[
+      {d:'Menú completo — Bowls, carnes, pastas, Fitzzerna',t:'Reel',a:36313,c:328,g:71,s:399,m:'Oct 25',u:'https://www.instagram.com/reel/DQccZmFkRKg/'},
+      {d:'Review GIA — Ven a #Bruncherna y compruébalo tú mismo',t:'Reel',a:37168,c:513,g:75,s:588,m:'Ene 26',u:'https://www.instagram.com/reel/DTVvKcqEWF5/'},
+      {d:'Dubai Sándwich con 4 bolas de helado — nunca falla',t:'Reel',a:29592,c:702,g:63,s:765,m:'Feb 26',u:'https://www.instagram.com/reel/DUTiIsrEW6Y/'},
+    ],
+    rows:[['Oct 25',15,'156K',1609,552,637,'4.24%'],['Nov 25',14,'180K',975,355,380,'2.64%'],['Dic 25',16,'189K',2001,787,230,'4.41%','hl'],['Ene 26',11,'122K',1245,256,190,'6.05%'],['Feb 26',12,'84K',1133,165,43,'4.99%'],['Mar 26',14,'103K',1271,242,122,'5.83%'],['Abr 26',15,'94K',1344,225,128,'5.76%']]
+  },
+  coliseo:{
+    months:['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26'],
+    alcance:[42762,61019,24394,181537,193362,75044,0,0,46345,204936,146118,261276,123204,155648,232190,315735],
+    er:[0,0,0,3.26,2.25,9.04,0,0,2.8,6.77,4.99,11.36,5.98,6.71,6.88,7.52],
+    comp:[344,433,247,1400,1398,1265,0,0,144,5063,455,2777,1169,1009,2866,6078],
+    segu:[8,91,62,657,429,111,0,0,544,1881,1205,1696,1066,1209,1862,2158],
+    top3:[
+      {d:'Abuela de la suerte — Junior FC campeón',t:'Reel',a:102043,c:1563,g:298,s:1861,m:'Dic 25',u:'https://www.instagram.com/reel/DR4rX6XjflF/'},
+      {d:'The GOAT — Burger Master 2025 (angus, trufa, 3 quesos)',t:'Foto',a:60204,c:803,g:190,s:993,m:'Abr 25',u:'https://www.instagram.com/p/DIz4BtLNBZs/'},
+      {d:'PEPPER BURGER — Master Latinoamérica 2026',t:'Reel',a:22702,c:883,g:78,s:961,m:'Abr 26',u:'https://www.instagram.com/reel/DXXl2YJElF0/'},
+    ],
+    rows:[['Ene 25',1,'43K',344,92,14,'3.59%'],['Feb 25',2,'61K',433,57,13,'3.14%'],['Mar 25',0,'—',0,0,0,'—','zero'],['Abr 25',7,'182K',1400,308,657,'3.26%'],['May 25',14,'193K',1398,234,429,'2.25%'],['Jun 25',5,'75K',1265,98,111,'9.04%','hl'],['Jul 25',0,'—',0,0,0,'—','zero'],['Ago 25',0,'—',0,0,0,'—','zero'],['Sep 25',7,'46K',144,30,260,'1.53%'],['Oct 25',8,'205K',5063,833,2509,'6.77%','hl'],['Nov 25',13,'146K',406,94,267,'4.66%'],['Dic 25',16,'261K',2777,497,706,'11.36%','hl'],['Ene 26',10,'123K',268,63,52,'4.46%'],['Feb 26',8,'156K',89,24,9,'3.41%'],['Mar 26',12,'232K',315,42,63,'2.72%'],['Abr 26',23,'316K',2980,299,122,'4.87%']]
+  },
+  dulcerna:{
+    months:['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26'],
+    alcance:[40109,0,168974,168399,398572,234590,100988,37461,64584,82801,104314,127931,115872,302341,60114,245255],
+    er:[4.32,0,2.81,4.59,1.47,1.56,2.35,3.14,3.13,2.26,3.83,3.69,2.63,8.38,3.16,7.93],
+    comp:[225,287,436,2654,825,419,312,160,263,276,561,1510,651,7665,268,4621],
+    guard:[77,0,247,440,288,273,237,101,118,137,267,480,230,3883,189,1616],
+    segu:[0,0,0,51,992,873,765,1167,1051,945,772,1084,577,2095,910,1034],
+    top3:[
+      {d:'"Envíale este video a esa amiga" — Dulcerna',t:'Reel',a:228824,c:7290,g:3730,s:11020,m:'Feb 26',u:'https://www.instagram.com/reel/DUT1mSxAQqL/'},
+      {d:'Carrito de helados — el rincón favorito de los invitados',t:'Reel',a:166296,c:2787,g:1336,s:4123,m:'Abr 26',u:'https://www.instagram.com/reel/DXsacSyCDXF/'},
+      {d:'NUTELLA AFFOGATO — nuevo café en el menú',t:'Reel',a:88548,c:2449,g:312,s:2761,m:'Abr 25',u:'https://www.instagram.com/reel/DIG2hV5xTID/'},
+    ],
+    rows:[['Ene 25',5,'40K',225,77,0,'4.32%'],['Feb 25',1,'—',287,0,0,'—'],['Mar 25',18,'169K',436,247,0,'2.81%'],['Abr 25',14,'168K',2654,440,51,'4.59%','hl'],['May 25',13,'399K',825,288,992,'1.47%','hl'],['Jun 25',9,'235K',419,273,873,'1.56%'],['Jul 25',8,'101K',312,237,765,'2.35%'],['Ago 25',7,'37K',160,101,1167,'3.14%'],['Sep 25',14,'65K',263,118,1051,'3.13%'],['Oct 25',11,'83K',276,137,945,'2.26%'],['Nov 25',13,'104K',561,267,772,'3.83%'],['Dic 25',17,'128K',1510,480,1084,'3.69%'],['Ene 26',14,'116K',651,230,577,'2.63%'],['Feb 26',14,'302K',7665,3883,2095,'8.38%','hl'],['Mar 26',12,'60K',268,189,910,'3.16%'],['Abr 26',10,'245K',4621,1616,1034,'7.93%']]
+  },
+  berna:{
+    months:['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26'],
+    alcance:[46816,90999,68087,36116,32010,27288,62247,43227,78590,427242,181700,280194,183914,183333,242444,359657],
+    er:[0,0,0,0,0,3.72,4.48,0,2.8,6.77,4.99,5.43,5.98,6.71,6.88,7.52],
+    comp:[0,0,0,0,0,3,1,0,143,5063,455,2037,1169,1009,2866,6078],
+    segu:[0,0,0,8,91,62,73,114,544,1881,1205,1696,1066,1209,1862,2158],
+    top3:[
+      {d:'Pizza pistacchio, Nutella y helado — Pizza de la Buena',t:'Reel',a:146412,c:5004,g:810,s:5814,m:'Oct 25',u:'https://www.instagram.com/reel/DQNLY-VgVTM/'},
+      {d:'"Desde las 12M; te espero." — Pizzerna',t:'Reel',a:77844,c:1542,g:136,s:1678,m:'Abr 26',u:'https://www.instagram.com/reel/DXZcxE-DcEj/'},
+      {d:'PEPPER BURGER @coliseo.sportsbar / #burgermaster',t:'Reel',a:54598,c:1371,g:125,s:1496,m:'Abr 26',u:'https://www.instagram.com/reel/DXXygPxDQAu/'},
+    ],
+    rows:[['Ene 25',1,'9K',5,5,0,'2.76%'],['Feb 25',2,'14K',2,8,0,'4.26%'],['Jun 25',1,'6K',3,5,62,'3.72%'],['Jul 25',1,'5K',1,6,73,'4.48%'],['Sep 25',2,'37K',143,29,544,'2.80%'],['Oct 25',3,'205K',5063,833,1881,'6.77%','hl'],['Nov 25',9,'146K',455,162,1205,'4.99%'],['Dic 25',13,'232K',2037,452,1696,'5.43%'],['Ene 26',10,'123K',1169,266,1066,'5.98%'],['Feb 26',15,'156K',1009,346,1209,'6.71%'],['Mar 26',14,'232K',2866,838,1862,'6.88%'],['Abr 26',16,'316K',6078,823,2158,'7.52%','hl']]
+  }
+};
+
+const COLORS = {pizzerna:'#3b82f6',coliseo:'#f59e0b',dulcerna:'#D4537E',berna:'#D85A30'};
+
+function kb(v){return(!v||v===0)?'—':v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':String(v);}
+function maxOf(arr){const nz=arr.filter(v=>v>0);return nz.length?Math.max(...nz):1;}
+
+function renderBars(id,labels,vals,color){
+  const el=document.getElementById(id);if(!el)return;
+  const max=maxOf(vals);
+  el.innerHTML=labels.map((l,i)=>{
+    const v=vals[i];
+    if(!v||v===0)return`<div class="bar-row"><span class="bar-lbl" style="color:var(--tx3)">${l}</span><div class="bar-track"><div style="height:100%;display:flex;align-items:center;padding-left:6px"><span style="font-size:9px;color:var(--tx3)">—</span></div></div></div>`;
+    const pct=Math.max(Math.round(v/max*100),4);
+    const bg=v===max?color:color+'55';
+    return`<div class="bar-row"><span class="bar-lbl">${l}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${bg}"><span>${kb(v)}</span></div></div></div>`;
+  }).join('');
+}
+
+function renderTop3(id,items,color){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=items.map((it,i)=>{
+    const badge=it.t==='Reel'?`<span class="t3-badge" style="background:rgba(59,130,246,.15);color:#60a5fa">REEL</span>`:it.t==='Carrusel'?`<span class="t3-badge" style="background:rgba(127,119,221,.15);color:#a78bfa">CARRUSEL</span>`:`<span class="t3-badge" style="background:rgba(34,197,94,.15);color:#86efac">FOTO</span>`;
+    return`<div class="t3-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:var(--mono);font-size:10px;color:var(--tx3)">#${i+1} ${it.m||''}</span><span class="t3-score" style="color:${color}">${it.s.toLocaleString()}</span></div>${badge}<div class="t3-title">${it.d}</div><div class="t3-meta">Alcance: ${it.a>0?it.a.toLocaleString():'—'} · Comp: ${it.c.toLocaleString()} · Guard: ${it.g}</div><a class="t3-link" href="${it.u}" target="_blank" style="color:${color}">Ver post →</a></div>`;
+  }).join('');
+}
+
+function renderTable(id,rows){
+  const tb=document.getElementById(id);if(!tb)return;
+  tb.innerHTML=rows.map(r=>{
+    const cls=r[r.length-1]==='hl'?'hl':r[r.length-1]==='zero'?'zero':'';
+    const cells=r.filter(c=>c!=='hl'&&c!=='zero');
+    return`<tr class="${cls}">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+  }).join('');
+}
+
+function activateBrand(brand){
+  const d=DATA[brand];if(!d)return;
+  const C=COLORS[brand];
+  const M=d.months;
+  renderBars(brand+'-bars',M,d.alcance,C);
+  renderTop3(brand+'-top3',d.top3,C);
+  renderTable(brand+'-table',d.rows);
+  if(brand==='pizzerna'){
+    renderBars('pz-reels-alc',M,d.reels_alc,'#3b82f6');
+    renderBars('pz-car-alc',M,d.car_alc,'#7f77dd');
+  }
+  const firstTab=document.querySelector(`#dash-${brand} .dtab`);
+  if(firstTab){firstTab.style.color=C;firstTab.style.borderColor=C+'66';}
+}
+
+// Metric tabs
+document.querySelectorAll('.dtab').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const brand=this.dataset.brand;
+    const metric=this.dataset.metric;
+    const C=COLORS[brand];
+    const d=DATA[brand];
+    const M=d.months;
+    const maps={
+      pizzerna:{alcance:d.alcance,er:d.er,comp:d.comp,guard:d.guard,segu:d.segu},
+      coliseo:{alcance:d.alcance,er:d.er,comp:d.comp,segu:d.segu},
+      dulcerna:{alcance:d.alcance,er:d.er,comp:d.comp,guard:d.guard,segu:d.segu},
+      berna:{alcance:d.alcance,er:d.er,comp:d.comp,segu:d.segu}
+    };
+    const vals=(maps[brand]||{})[metric]||d.alcance;
+    const titles={alcance:'Alcance por mes',er:'Engagement Rate % por mes',comp:'Compartidos por mes',guard:'Guardados por mes',segu:'Seguimientos / Seg. nuevos por mes'};
+    const titleEl=document.getElementById(brand+'-chart-title');
+    if(titleEl)titleEl.textContent=titles[metric]||metric;
+    // reset sibling tabs
+    this.closest('.dtabs').querySelectorAll('.dtab').forEach(t=>{t.style.color='';t.style.borderColor='';});
+    this.style.color=C;this.style.borderColor=C+'66';
+    renderBars(brand+'-bars',M,vals,C);
+  });
+});
+
+// Brand tabs
+let activeCls='';
+document.querySelectorAll('.brand-tab').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const brand=this.dataset.brand;
+    const cls=this.dataset.cls;
+    document.querySelectorAll('.brand-tab').forEach(t=>{t.className='brand-tab';});
+    this.classList.add(cls);
+    document.querySelectorAll('.brand-dash').forEach(d=>d.classList.remove('active'));
+    document.getElementById('dash-'+brand).classList.add('active');
+    const names={pizzerna:'Pizzerna',coliseo:'Coliseo Sports Bar',dulcerna:'Dulcerna',berna:'Bernardo Mancini'};
+    document.getElementById('topbar-brand').textContent=names[brand]||brand;
+    activateBrand(brand);
+  });
+});
+
+// Auto-select Pizzerna on load
+document.querySelector('[data-brand="pizzerna"]').click();
+</script>
+</body>
+</html>
