@@ -39,7 +39,15 @@ a{color:inherit}
 .kv{font-size:22px;font-weight:700;color:#1a1a1a;line-height:1.1}
 .ks{font-size:11px;color:#aaa;margin-top:3px}
 .section{background:#fff;border:1px solid #dddad4;border-radius:10px;padding:18px;margin-bottom:16px}
-.stitle{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;font-family:'IBM Plex Mono',monospace;margin-bottom:14px}
+.stitle{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;font-family:'IBM Plex Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.stitle-text{flex:1}
+.drag-handle{cursor:grab;color:#ccc;font-size:16px;padding:2px 4px;border-radius:3px;transition:color .15s;flex-shrink:0;line-height:1}
+.drag-handle:hover{color:#888;background:#f0ede8}
+.drag-handle:active{cursor:grabbing}
+.section.dragging{opacity:.4;border-color:#be185d!important}
+.section.drag-over{border-top:2px solid #be185d}
+.layout-reset{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa;background:transparent;border:1px solid #dddad4;border-radius:4px;padding:2px 8px;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.layout-reset:hover{color:#333;border-color:#888}
 .dtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .dtab{font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #c8c5bf;background:transparent;color:#aaa;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s}
 .dtab:hover{color:#4a4a4a;border-color:#888}
@@ -82,6 +90,7 @@ a{color:inherit}
 </div>
 
 <div class="body">
+  <button class="layout-reset" onclick="resetLayout()">&#8635; Restablecer orden</button>
   <div class="btabs">
     <button class="btab" id="tab-pz"    onclick="showBrand('pz')">Pizzerna</button>
     <button class="btab" id="tab-co"    onclick="showBrand('co')">Coliseo</button>
@@ -114,14 +123,14 @@ a{color:inherit}
       <button class="dtab" onclick="switchMetric('pz','guard','#be185d',this)">Guardados</button>
       <button class="dtab" onclick="switchMetric('pz','segu','#7c3aed',this)">Seguimientos</button>
     </div>
-    <div class="section"><div class="stitle" id="chart-title-pz">Alcance por mes</div><div id="chart-pz"></div></div>
+    <div class="section" draggable="true" data-sid="1"><div class="stitle" id="chart-title-pz"><span class="stitle-text">Alcance por mes</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div id="chart-pz"></div></div>
     <div class="two">
-      <div class="section"><div class="stitle">Reels &mdash; Alcance</div><div id="chart-pz-reels"></div></div>
-      <div class="section"><div class="stitle">Carruseles &mdash; Alcance</div><div id="chart-pz-car"></div></div>
+      <div class="section" draggable="true" data-sid="2"><div class="stitle"><span class="stitle-text">Reels &mdash; Alcance</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div id="chart-pz-reels"></div></div>
+      <div class="section" draggable="true" data-sid="3"><div class="stitle"><span class="stitle-text">Carruseles &mdash; Alcance</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div id="chart-pz-car"></div></div>
     </div>
-    <div class="section"><div class="stitle">Top 3 posts (Guardados + Compartidos)</div><div class="t3grid" id="top3-pz"></div></div>
-    <div class="section"><div class="stitle">Resumen mensual</div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seguim.</th><th>ER%</th></tr></thead><tbody id="table-pz"></tbody></table></div></div>
-    <div class="section"><div class="stitle">Insights para el equipo</div>
+    <div class="section" draggable="true" data-sid="4"><div class="stitle"><span class="stitle-text">Top 3 posts (Guardados + Compartidos)</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div class="t3grid" id="top3-pz"></div></div>
+    <div class="section" draggable="true" data-sid="5"><div class="stitle"><span class="stitle-text">Resumen mensual</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Formato</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seguim.</th><th>ER%</th></tr></thead><tbody id="table-pz"></tbody></table></div></div>
+    <div class="section" draggable="true" data-sid="6"><div class="stitle"><span class="stitle-text">Insights para el equipo</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div>
       <div class="ins" style="background:#eff6ff;border-color:#2563eb"><div class="insl" style="color:#2563eb">Formato</div><div class="inst">Los Reels generan el 93% del alcance. Un Reel promedio alcanza 11,826 personas vs 1,933 de un carrusel. Reels para llegar a nuevas personas, carruseles para contenido guardable.</div></div>
       <div class="ins" style="background:#f0fdf4;border-color:#16a34a"><div class="insl" style="color:#16a34a">Contenido ganador</div><div class="inst">Reviews reales (Gia, clientes) y colabs con @bernardomancini generan 3x m&aacute;s compartidos. Dubai S&aacute;ndwich (702 comp.) y review GIA (513 comp.) son los mejores ejemplos.</div></div>
       <div class="ins" style="background:#fffbeb;border-color:#d97706"><div class="insl" style="color:#d97706">Tendencia 2026</div><div class="inst">Abr 2026: interacciones m&aacute;s altas del per&iacute;odo (13,494). Se necesita contenido que salga del c&iacute;rculo de seguidores &mdash; un Reel viral por mes m&iacute;nimo.</div></div>
@@ -152,10 +161,10 @@ a{color:inherit}
       <button class="dtab" onclick="switchMetric('co','comp','#2563eb',this)">Compartidos</button>
       <button class="dtab" onclick="switchMetric('co','segu','#7c3aed',this)">Seg. nuevos</button>
     </div>
-    <div class="section"><div class="stitle" id="chart-title-co">Alcance por mes</div><div id="chart-co"></div></div>
-    <div class="section"><div class="stitle">Top 3 posts hist&oacute;ricos</div><div class="t3grid" id="top3-co"></div></div>
-    <div class="section"><div class="stitle">Resumen mensual</div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seguim.</th><th>ER%</th></tr></thead><tbody id="table-co"></tbody></table></div></div>
-    <div class="section"><div class="stitle">Insights para el equipo</div>
+    <div class="section" draggable="true" data-sid="7"><div class="stitle" id="chart-title-co"><span class="stitle-text">Alcance por mes</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div id="chart-co"></div></div>
+    <div class="section" draggable="true" data-sid="8"><div class="stitle"><span class="stitle-text">Top 3 posts hist&oacute;ricos</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div class="t3grid" id="top3-co"></div></div>
+    <div class="section" draggable="true" data-sid="9"><div class="stitle"><span class="stitle-text">Resumen mensual</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Formato</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seguim.</th><th>ER%</th></tr></thead><tbody id="table-co"></tbody></table></div></div>
+    <div class="section" draggable="true" data-sid="10"><div class="stitle"><span class="stitle-text">Insights para el equipo</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div>
       <div class="ins" style="background:#f0fdf4;border-color:#16a34a"><div class="insl" style="color:#16a34a">Motor viral #1 &mdash; Junior FC</div><div class="inst">Dic 2025 (Junior campe&oacute;n): 261K alcance, ER 11.36%. La &ldquo;abuela de la suerte&rdquo; fue el mejor post (102K alcance, 1,563 comp). Los momentos reales del p&uacute;blico son 10x m&aacute;s efectivos que contenido de producto.</div></div>
       <div class="ins" style="background:#fffbeb;border-color:#d97706"><div class="insl" style="color:#d97706">Motor viral #2 &mdash; Burger Master</div><div class="inst">Abr 2025 (The GOAT 181K) y Abr 2026 (Pepper Burger 183K). Evento anual predecible. Para 2027: documentar el proceso desde semanas antes para alargar el contenido.</div></div>
       <div class="ins" style="background:#eff6ff;border-color:#2563eb"><div class="insl" style="color:#2563eb">Motor viral #3 &mdash; Cultura pop</div><div class="inst">Jun 2025: La Casa de los Famosos gener&oacute; ER 9.04% con solo 5 posts. 1 evento de cultura pop por mes llena el vac&iacute;o entre temporadas de f&uacute;tbol.</div></div>
@@ -180,7 +189,7 @@ a{color:inherit}
       <div class="kpi"><div class="kl">Guardados</div><div class="kv">8,901</div></div>
       <div class="kpi"><div class="kl">Seguidores</div><div class="kv">90,500</div><div class="ks">la m&aacute;s grande del grupo</div></div>
     </div>
-    <div class="vbox" style="background:#fdf0f5;border:1px solid #fbcfe8">
+    <div class="vbox section" draggable="true" data-sid="vbox1" style="background:#fdf0f5;border:1px solid #fbcfe8">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#be185d;font-weight:700;margin-bottom:6px;letter-spacing:.08em">MEJOR POST DE TODO EL GRUPO &mdash; FEB 2026</div>
       <div style="font-size:14px;color:#4a4a4a;margin-bottom:6px">&ldquo;Env&iacute;ale este video a esa amiga con la que necesitas hacer este plan esta semana&rdquo;</div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:12px">
@@ -196,10 +205,10 @@ a{color:inherit}
       <button class="dtab" onclick="switchMetric('dul','guard','#d97706',this)">Guardados</button>
       <button class="dtab" onclick="switchMetric('dul','segu','#7c3aed',this)">Seg. nuevos</button>
     </div>
-    <div class="section"><div class="stitle" id="chart-title-dul">Alcance por mes</div><div id="chart-dul"></div></div>
-    <div class="section"><div class="stitle">Top 3 posts hist&oacute;ricos</div><div class="t3grid" id="top3-dul"></div></div>
-    <div class="section"><div class="stitle">Resumen mensual</div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seg. nuevos</th><th>ER%</th></tr></thead><tbody id="table-dul"></tbody></table></div></div>
-    <div class="section"><div class="stitle">Insights para el equipo</div>
+    <div class="section" draggable="true" data-sid="11"><div class="stitle" id="chart-title-dul"><span class="stitle-text">Alcance por mes</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div id="chart-dul"></div></div>
+    <div class="section" draggable="true" data-sid="12"><div class="stitle"><span class="stitle-text">Top 3 posts hist&oacute;ricos</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div class="t3grid" id="top3-dul"></div></div>
+    <div class="section" draggable="true" data-sid="13"><div class="stitle"><span class="stitle-text">Resumen mensual</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Formato</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seg. nuevos</th><th>ER%</th></tr></thead><tbody id="table-dul"></tbody></table></div></div>
+    <div class="section" draggable="true" data-sid="14"><div class="stitle"><span class="stitle-text">Insights para el equipo</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div>
       <div class="ins" style="background:#f0fdf4;border-color:#16a34a"><div class="insl" style="color:#16a34a">&ldquo;Env&iacute;ale / M&aacute;ndale este video&rdquo; &mdash; f&oacute;rmula #1</div><div class="inst">Hook de reenv&iacute;o + experiencia irresistible + CTA social impl&iacute;cito. Feb 26 (score 11,020), Abr 26 affogato (score 1,834), Abr 25 Nutella Affogato (score 2,761). Replicar m&iacute;nimo 1 vez al mes.</div></div>
       <div class="ins" style="background:#f0fdf4;border-color:#16a34a"><div class="insl" style="color:#16a34a">Fechas especiales + celebridades</div><div class="inst">Mayo 25: famoso en el mes de la madre = 398K alcance (el mayor del a&ntilde;o). Las colabs con personalidades locales + fechas especiales son el segundo motor m&aacute;s potente.</div></div>
       <div class="ins" style="background:#eff6ff;border-color:#2563eb"><div class="insl" style="color:#2563eb">Abril es el mes m&aacute;s poderoso del a&ntilde;o</div><div class="inst">Abr 25 (168K) y Abr 26 (245K). Semana Santa + eventos + bodas. Planear el pr&oacute;ximo lanzamiento viral para esta fecha.</div></div>
@@ -233,8 +242,8 @@ a{color:inherit}
       </div>
       <a href="https://www.instagram.com/reel/DQNLY-VgVTM/" target="_blank" style="font-size:12px;color:#c2410c;text-decoration:none;display:inline-block;margin-top:8px;font-family:'IBM Plex Mono',monospace">Ver post &rarr;</a>
     </div>
-    <div class="section">
-      <div class="stitle">Transformaci&oacute;n de la cuenta</div>
+    <div class="section" draggable="true" data-sid="15">
+      <div class="stitle"><span class="stitle-text">Transformaci&oacute;n de la cuenta</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div>
       <div class="tl">
         <div class="tli"><div class="tldate" style="color:#aaa">ENE &ndash; SEP 2025</div><div class="tltext">Contenido personal (familia, viajes). 1&ndash;2 posts/mes. Sin estrategia de negocio. Crecimiento m&iacute;nimo.</div></div>
         <div class="tli"><div class="tldate" style="color:#c2410c">OCT 2025 &mdash; PUNTO DE QUIEBRE</div><div class="tltext">3 Reels de pizza &rarr; 204K alcance. El viral de la pizza genera +2,281 seguidores en un solo post. La cuenta descubre su nicho real.</div></div>
@@ -247,10 +256,10 @@ a{color:inherit}
       <button class="dtab" onclick="switchMetric('berna','comp','#2563eb',this)">Compartidos</button>
       <button class="dtab" onclick="switchMetric('berna','segu','#7c3aed',this)">Seg. nuevos</button>
     </div>
-    <div class="section"><div class="stitle" id="chart-title-berna">Alcance cuenta por mes</div><div id="chart-berna"></div></div>
-    <div class="section"><div class="stitle">Top posts &mdash; desde Oct 2025</div><div class="t3grid" id="top3-berna"></div></div>
-    <div class="section"><div class="stitle">Resumen mensual</div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seg. nuevos</th><th>ER%</th></tr></thead><tbody id="table-berna"></tbody></table></div></div>
-    <div class="section"><div class="stitle">Insights estrat&eacute;gicos</div>
+    <div class="section" draggable="true" data-sid="16"><div class="stitle" id="chart-title-berna"><span class="stitle-text">Alcance cuenta por mes</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div id="chart-berna"></div></div>
+    <div class="section" draggable="true" data-sid="17"><div class="stitle"><span class="stitle-text">Top posts &mdash; desde Oct 2025</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div class="t3grid" id="top3-berna"></div></div>
+    <div class="section" draggable="true" data-sid="18"><div class="stitle"><span class="stitle-text">Resumen mensual</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div><div style="overflow-x:auto"><table class="stable"><thead><tr><th>Mes</th><th>Posts</th><th>Formato</th><th>Alcance</th><th>Comp.</th><th>Guard.</th><th>Seg. nuevos</th><th>ER%</th></tr></thead><tbody id="table-berna"></tbody></table></div></div>
+    <div class="section" draggable="true" data-sid="19"><div class="stitle"><span class="stitle-text">Insights estrat&eacute;gicos</span><span class="drag-handle" title="Arrastra para reordenar">&#8942;</span></div>
       <div class="ins" style="background:#f0fdf4;border-color:#16a34a"><div class="insl" style="color:#16a34a">El amplificador m&aacute;s potente del grupo</div><div class="inst">La Pepper Burger en su cuenta (score 1,496) super&oacute; el mismo post en Coliseo (score 961). Cuando BERNA promueve un producto del grupo, el alcance se multiplica.</div></div>
       <div class="ins" style="background:#fffbeb;border-color:#d97706"><div class="insl" style="color:#d97706">Reviews gastron&oacute;micos = el formato m&aacute;s compartido</div><div class="inst">NYC Golden Diner (score 357), Ceres NYC (score 678), pizza viral (score 5,814). La gente los reenv&iacute;a como recomendaciones. Este es el activo editorial m&aacute;s valioso de la cuenta.</div></div>
       <div class="ins" style="background:#eff6ff;border-color:#2563eb"><div class="insl" style="color:#2563eb">Colabs con figuras locales = palanca de crecimiento</div><div class="inst">Andr&eacute;s Bilbao (score 610, +566 seg.), dr.javierdiago (score 697). 2 colabs mensuales con perfiles de 10K&ndash;50K en Barranquilla es la estrategia m&aacute;s predecible para llegar a 30K.</div></div>
@@ -277,13 +286,13 @@ var D = {
       {d:'Men\u00fa completo \u2014 Bowls, carnes, pastas, Fitzzerna',t:'Reel',a:36313,c:328,g:71,s:399,m:'Oct 25',u:'https://www.instagram.com/reel/DQccZmFkRKg/'}
     ],
     rows: [
-      ['Oct 25',15,'156K',1609,552,637,'4.24%'],
-      ['Nov 25',14,'180K',975,355,380,'2.64%'],
-      ['Dic 25',16,'189K',2001,787,230,'4.41%','hl'],
-      ['Ene 26',11,'122K',1245,256,190,'6.05%'],
-      ['Feb 26',12,'84K',1133,165,43,'4.99%'],
-      ['Mar 26',14,'103K',1271,242,122,'5.83%'],
-      ['Abr 26',15,'94K',1344,225,128,'5.76%']
+      ['Oct 25',15,'11R·4C','156K',1609,552,637,'4.24%'],
+      ['Nov 25',14,'11R·3C','180K',975,355,380,'2.64%'],
+      ['Dic 25',16,'12R·4C','189K',2001,787,230,'4.41%','hl'],
+      ['Ene 26',11,'8R·3C','122K',1245,256,190,'6.05%'],
+      ['Feb 26',12,'10R·2C','84K',1133,165,43,'4.99%'],
+      ['Mar 26',14,'11R·3C','103K',1271,242,122,'5.83%'],
+      ['Abr 26',15,'12R·3C','94K',1344,225,128,'5.76%']
     ]
   },
   co: {
@@ -359,18 +368,18 @@ var D = {
       {d:'PEPPER BURGER @coliseo.sportsbar / #burgermaster',t:'Reel',a:54598,c:1371,g:125,s:1496,m:'Abr 26',u:'https://www.instagram.com/reel/DXXygPxDQAu/'}
     ],
     rows: [
-      ['Ene 25',1,'9K',5,5,0,'2.76%'],
-      ['Feb 25',2,'14K',2,8,0,'4.26%'],
-      ['Jun 25',1,'6K',3,5,62,'3.72%'],
-      ['Jul 25',1,'5K',1,6,73,'4.48%'],
-      ['Sep 25',2,'37K',143,29,544,'2.80%'],
-      ['Oct 25',3,'205K',5063,833,1881,'6.77%','hl'],
-      ['Nov 25',9,'146K',455,162,1205,'4.99%'],
-      ['Dic 25',13,'232K',2037,452,1696,'5.43%'],
-      ['Ene 26',10,'123K',1169,266,1066,'5.98%'],
-      ['Feb 26',15,'156K',1009,346,1209,'6.71%'],
-      ['Mar 26',14,'232K',2866,838,1862,'6.88%'],
-      ['Abr 26',16,'316K',6078,823,2158,'7.52%','hl']
+      ['Ene 25',1,'1F',    '9K',5,5,0,'2.76%'],
+      ['Feb 25',2,'1F·1C', '14K',2,8,0,'4.26%'],
+      ['Jun 25',1,'1F',    '6K',3,5,62,'3.72%'],
+      ['Jul 25',1,'1C',    '5K',1,6,73,'4.48%'],
+      ['Sep 25',2,'1R·1C', '37K',143,29,544,'2.80%'],
+      ['Oct 25',3,'3R',    '205K',5063,833,1881,'6.77%','hl'],
+      ['Nov 25',9,'8R·1C', '146K',455,162,1205,'4.99%'],
+      ['Dic 25',13,'11R·2C','232K',2037,452,1696,'5.43%'],
+      ['Ene 26',10,'10R',  '123K',1169,266,1066,'5.98%'],
+      ['Feb 26',15,'13R·2C','156K',1009,346,1209,'6.71%'],
+      ['Mar 26',14,'12R·2C','232K',2866,838,1862,'6.88%'],
+      ['Abr 26',16,'15R·1C','316K',6078,823,2158,'7.52%','hl']
     ]
   }
 };
@@ -490,8 +499,77 @@ function showBrand(brand){
   if(firstTab){ firstTab.style.color=C; firstTab.style.borderColor=C+'66'; }
 }
 
+
+// ── DRAG & DROP para reordenar secciones ──────────────────────────────────────
+var dragSrc = null;
+
+document.addEventListener('dragstart', function(e) {
+  var sec = e.target.closest('.section[draggable]');
+  if (!sec) return;
+  dragSrc = sec;
+  setTimeout(function(){ sec.classList.add('dragging'); }, 0);
+  e.dataTransfer.effectAllowed = 'move';
+});
+
+document.addEventListener('dragend', function(e) {
+  document.querySelectorAll('.section').forEach(function(s){
+    s.classList.remove('dragging','drag-over');
+    s.style.opacity = '';
+  });
+  dragSrc = null;
+  saveCurrent();
+});
+
+document.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  var target = e.target.closest('.section[draggable]');
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('drag-over'); });
+  if (target && target !== dragSrc) target.classList.add('drag-over');
+});
+
+document.addEventListener('drop', function(e) {
+  e.preventDefault();
+  var target = e.target.closest('.section[draggable]');
+  if (!target || target === dragSrc || !dragSrc) return;
+  var parent = target.parentNode;
+  var siblings = Array.from(parent.querySelectorAll(':scope > .section[draggable]'));
+  var si = siblings.indexOf(dragSrc);
+  var ti = siblings.indexOf(target);
+  if (si < ti) parent.insertBefore(dragSrc, target.nextSibling);
+  else parent.insertBefore(dragSrc, target);
+});
+
+function saveCurrent() {
+  var brand = document.querySelector('.dash.on');
+  if (!brand) return;
+  var key = 'ninania-layout-' + brand.id;
+  var order = Array.from(brand.querySelectorAll(':scope > .section[data-sid]'))
+    .map(function(s){ return s.dataset.sid; });
+  localStorage.setItem(key, JSON.stringify(order));
+}
+
+function restoreLayout(brand) {
+  var saved = localStorage.getItem('ninania-layout-dash-'+brand);
+  if (!saved) return;
+  var order;
+  try { order = JSON.parse(saved); } catch(e) { return; }
+  var dash = document.getElementById('dash-'+brand);
+  order.forEach(function(sid) {
+    var el = dash.querySelector('[data-sid="'+sid+'"]');
+    if (el) dash.appendChild(el);
+  });
+}
+
+function resetLayout() {
+  var brand = document.querySelector('.dash.on');
+  if (!brand) return;
+  localStorage.removeItem('ninania-layout-' + brand.id);
+  location.reload();
+}
+
 // Load Pizzerna on start
 showBrand('pz');
+
 </script>
 </body>
 </html>
