@@ -7,26 +7,26 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 :root{
-  --bg:#07090e;--s1:#0d1018;--s2:#131720;--s3:#191f2a;
-  --b1:#1c2233;--b2:#263045;--b3:#334060;
-  --tx:#dde4f2;--tx2:#8898b8;--tx3:#445068;
-  --red:#f03e3e;--red2:#2d1010;--red3:#6b1a1a;
-  --amb:#f59e0b;--amb2:#271c04;--amb3:#6b4508;
-  --grn:#22c55e;--grn2:#0a1f14;--grn3:#135a2a;
-  --blu:#3b82f6;--blu2:#0b1c38;--blu3:#173568;
-  --pk:#D4537E;--pk2:#2a0d19;--pk3:#6b1a3a;
-  --teal:#1D9E75;--teal2:#071a13;--teal3:#0f4a30;
-  --co:#D85A30;--co2:#2a1008;--co3:#6b2810;
+  --bg:#f7f5f0;--s1:#ffffff;--s2:#f0ede8;--s3:#e8e5e0;
+  --b1:#dddad4;--b2:#c8c5bf;--b3:#b0ada8;
+  --tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#888888;
+  --red:#f03e3e;--red2:#fdf0f0;--red3:#f5c6c6;
+  --amb:#f59e0b;--amb2:#fffbeb;--amb3:#fde68a;
+  --grn:#22c55e;--grn2:#f0fdf4;--grn3:#bbf7d0;
+  --blu:#3b82f6;--blu2:#eff6ff;--blu3:#bfdbfe;
+  --pk:#D4537E;--pk2:#fdf0f5;--pk3:#f5c6d8;
+  --teal:#1D9E75;--teal2:#f0fdf9;--teal3:#bbf7e0;
+  --co:#D85A30;--co2:#fff7f0;--co3:#fdd6c0;
   --accent:#e8c84a;
   --mono:'IBM Plex Mono',monospace;
   --sans:'IBM Plex Sans',sans-serif;
   --r:8px;--r2:14px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;font-size:19px}
 
-.topbar{position:sticky;top:0;z-index:100;background:rgba(7,9,14,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;padding:0 20px;height:54px}
-.back-btn{display:flex;align-items:center;gap:6px;color:var(--tx3);font-family:var(--mono);font-size:11px;letter-spacing:.1em;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:5px 12px;text-decoration:none;transition:all .2s;flex-shrink:0}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(247,245,240,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;padding:0 20px;height:54px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--tx2);font-family:var(--mono);font-size:11px;letter-spacing:.1em;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:5px 12px;text-decoration:none;transition:all .2s;flex-shrink:0}
 .back-btn:hover{color:var(--accent);border-color:var(--amb3)}
 .topbar-title{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--tx2);letter-spacing:.08em}
 .topbar-brand{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--pk);margin-left:auto}
@@ -35,7 +35,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
 .body{padding:24px;max-width:1200px;margin:0 auto}
 
 .brand-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
-.brand-tab{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;padding:7px 16px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--tx3);cursor:pointer;transition:all .2s;text-transform:uppercase}
+.brand-tab{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;padding:7px 16px;border-radius:6px;border:1px solid var(--b2);background:var(--s1);color:var(--tx3);cursor:pointer;transition:all .2s;text-transform:uppercase}
 .brand-tab:hover{border-color:var(--b3);color:var(--tx2)}
 .brand-tab.act-pz{background:var(--blu2);color:var(--blu);border-color:var(--blu3)}
 .brand-tab.act-co{background:var(--amb2);color:var(--amb);border-color:var(--amb3)}
@@ -69,12 +69,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
 .chart-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-family:var(--mono);margin-bottom:14px}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .bar-lbl{font-size:10px;color:var(--tx2);width:52px;flex-shrink:0;text-align:right;font-family:var(--mono)}
-.bar-track{flex:1;background:var(--s3);border-radius:3px;height:18px;overflow:hidden}
+.bar-track{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:3px;height:18px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px}
 .bar-fill span{font-size:9px;font-weight:700;color:rgba(255,255,255,.9);white-space:nowrap}
 
 .top3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:8px}
-.t3-card{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px}
+.t3-card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px}
 .t3-score{font-size:18px;font-weight:700;font-family:var(--mono)}
 .t3-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;font-family:var(--mono);letter-spacing:.08em}
 .t3-title{font-size:11.5px;font-weight:600;color:var(--tx);margin:6px 0 4px;line-height:1.4}
@@ -85,21 +85,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
 .sum-table th{text-align:left;color:var(--tx3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--b1);font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase}
 .sum-table td{padding:6px 8px;border-bottom:1px solid var(--b2);color:var(--tx2)}
 .sum-table tr:last-child td{border-bottom:none}
-.sum-table tr.hl td{background:var(--s2)}
-.sum-table tr.zero td{color:var(--tx3)}
+.sum-table tr.hl td{background:#f5f2ec}
+.sum-table tr.zero td{color:#aaa}
 
 .viral-box{border-radius:10px;padding:14px;margin-bottom:16px}
 .insight-card{border-left:3px solid;padding:10px 14px;margin-bottom:8px}
 .ins-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;font-family:var(--mono)}
 .ins-txt{font-size:11.5px;line-height:1.6;color:var(--tx2)}
-.i-grn{background:rgba(34,197,94,.06);border-color:var(--grn)}
-.i-amb{background:rgba(245,158,11,.06);border-color:var(--amb)}
-.i-blu{background:rgba(59,130,246,.06);border-color:var(--blu)}
-.i-red{background:rgba(240,62,62,.06);border-color:var(--red)}
-.i-pu{background:rgba(127,119,221,.06);border-color:#7f77dd}
+.i-grn{background:#f0fdf4;border-color:var(--grn)}
+.i-amb{background:#fffbeb;border-color:var(--amb)}
+.i-blu{background:#eff6ff;border-color:var(--blu)}
+.i-red{background:#fdf0f0;border-color:var(--red)}
+.i-pu{background:#f5f3ff;border-color:#7f77dd}
 
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.timeline{border-left:2px solid var(--co3);padding-left:14px}
+.timeline{border-left:2px solid #fdd6c0;padding-left:14px}
 .tl-item{margin-bottom:12px}
 .tl-date{font-family:var(--mono);font-size:10px;letter-spacing:.06em;margin-bottom:3px}
 .tl-text{font-size:11.5px;color:var(--tx2)}
@@ -121,7 +121,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
     <button class="brand-tab" data-brand="pizzerna" data-cls="act-pz">Pizzerna</button>
     <button class="brand-tab" data-brand="coliseo"  data-cls="act-co">Coliseo</button>
     <button class="brand-tab" data-brand="dulcerna" data-cls="act-dul">Dulcerna</button>
-    <button class="brand-tab" data-brand="berna"    data-cls="act-berna">Bernardo Mancini</button>
+    <button class="brand-tab" data-brand="berna"    data-cls="act-berna">BERNA</button>
   </div>
 
   <!-- PIZZERNA -->
@@ -225,7 +225,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
       <div class="kpi"><div class="kpi-label">Guardados</div><div class="kpi-val">8,901</div></div>
       <div class="kpi"><div class="kpi-label">Seguidores hoy</div><div class="kpi-val">90,500</div><div class="kpi-sub">la más grande del grupo</div></div>
     </div>
-    <div class="viral-box" style="background:rgba(212,83,126,.07);border:1px solid var(--pk3)">
+    <div class="viral-box" style="background:#fdf5f8;border:1px solid #f5c6d8">
       <div style="font-family:var(--mono);font-size:10px;color:#e879a0;font-weight:700;margin-bottom:6px;letter-spacing:.08em">MEJOR POST DE TODO EL GRUPO — FEB 2026</div>
       <div style="font-size:12px;color:var(--tx2);margin-bottom:6px">"Envíale este video a esa amiga con la que necesitas hacer este plan esta semana"</div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
@@ -257,8 +257,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
   <!-- BERNARDO -->
   <div class="brand-dash" id="dash-berna">
     <div class="dash-header">
-      <div class="dash-name">Bernardo Mancini</div>
-      <div class="dash-meta">Ene 2025 – Abr 2026 · 87 posts · Instagram · marca personal</div>
+      <div class="dash-name">BERNA</div>
+      <div class="dash-meta">Ene 2025 – Abr 2026 · 87 posts · Instagram</div>
       <div class="dash-badges">
         <span class="dbadge bg">+170% crecimiento anual</span>
         <span class="dbadge bc">Score 5,814 — 2° mejor post del grupo</span>
@@ -273,7 +273,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
       <div class="kpi"><div class="kpi-label">Guardados</div><div class="kpi-val">4,213</div></div>
       <div class="kpi"><div class="kpi-label">Seguidores hoy</div><div class="kpi-val">19,000</div><div class="kpi-sub">+170% en 12 meses</div></div>
     </div>
-    <div class="viral-box" style="background:rgba(216,90,48,.07);border:1px solid var(--co3)">
+    <div class="viral-box" style="background:#fff7f3;border:1px solid #fdd6c0">
       <div style="font-family:var(--mono);font-size:10px;color:var(--co);font-weight:700;margin-bottom:6px;letter-spacing:.08em">2° MEJOR POST DEL GRUPO — OCT 2025</div>
       <div style="font-size:12px;color:var(--tx2);margin-bottom:6px">"Mucho pistacchio, mucha Nutella, mucho helado en la masa de la Pizza de la Buena"</div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
@@ -454,7 +454,7 @@ document.querySelectorAll('.brand-tab').forEach(btn=>{
     this.classList.add(cls);
     document.querySelectorAll('.brand-dash').forEach(d=>d.classList.remove('active'));
     document.getElementById('dash-'+brand).classList.add('active');
-    const names={pizzerna:'Pizzerna',coliseo:'Coliseo Sports Bar',dulcerna:'Dulcerna',berna:'Bernardo Mancini'};
+    const names={pizzerna:'Pizzerna',coliseo:'Coliseo Sports Bar',dulcerna:'Dulcerna',berna:'BERNA — Marca Personal'};
     document.getElementById('topbar-brand').textContent=names[brand]||brand;
     activateBrand(brand);
   });
