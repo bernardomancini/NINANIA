@@ -7,7 +7,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-height:100vh;font-size:16px}
+body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-height:100vh;font-size:19px}
 .topbar{position:sticky;top:0;z-index:100;background:rgba(247,245,240,.97);backdrop-filter:blur(12px);border-bottom:1px solid #dddad4;display:flex;align-items:center;gap:12px;padding:0 20px;height:54px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
 .back{display:flex;align-items:center;gap:6px;color:#888;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;background:transparent;border:1px solid #c8c5bf;border-radius:6px;padding:5px 12px;text-decoration:none;transition:all .2s;flex-shrink:0}
 .back:hover{color:#1a1a1a;border-color:#888}
@@ -27,7 +27,28 @@ body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min
 .fdbtn:hover{border-color:#888;color:#333}
 .fdbtn.on{background:#1D9E75;color:#fff;border-color:#1D9E75}
 .date-input-sm{font-family:'IBM Plex Mono',monospace;font-size:12px;padding:4px 10px;border:1px solid #c8c5bf;border-radius:6px;background:#fff;color:#333;cursor:pointer}
-.body{padding:24px;max-width:1300px;margin:0 auto}
+.body{padding:24px;max-width:1400px;margin:0 auto}
+.dash-grid{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.panel{background:#fff;border:1px solid #dddad4;border-radius:10px;padding:16px;position:relative;transition:box-shadow .2s,opacity .2s;min-width:280px}
+.panel.dragging{opacity:.4;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.panel.drag-over{border:2px dashed #1D9E75;background:#f0fdf9}
+.panel-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:default}
+.panel-drag{cursor:grab;color:#ccc;font-size:18px;padding:2px 4px;border-radius:3px;transition:color .15s;flex-shrink:0;line-height:1;user-select:none}
+.panel-drag:hover{color:#888;background:#f0ede8}
+.panel-drag:active{cursor:grabbing}
+.panel-title{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;flex:1}
+.panel-actions{display:flex;gap:4px;flex-shrink:0}
+.panel-btn{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 7px;border:1px solid #dddad4;border-radius:4px;background:#f7f5f0;color:#aaa;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.panel-btn:hover{border-color:#888;color:#333}
+.panel-btn.active-size{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.panel.size-sm{width:calc(25% - 11px)}
+.panel.size-md{width:calc(50% - 7px)}
+.panel.size-lg{width:calc(75% - 4px)}
+.panel.size-full{width:100%}
+.layout-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.layout-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 10px;border:1px solid #c8c5bf;border-radius:5px;background:#f7f5f0;color:#888;cursor:pointer;transition:all .15s}
+.layout-btn:hover{border-color:#888;color:#333}
+@media(max-width:800px){.panel.size-sm,.panel.size-md,.panel.size-lg{width:100%}}
 .state{text-align:center;padding:80px 24px}
 .spinner{width:32px;height:32px;border:3px solid #e0ddd8;border-top-color:#1D9E75;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -139,48 +160,122 @@ body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min
     </div>
   </div>
   <div id="dash" style="display:none">
-    <div class="kgrid" id="kpi-area"></div>
+  <div class="layout-bar">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.06em">ORGANIZAR:</span>
+    <button class="layout-btn" onclick="resetLayout()">&#8635; Restablecer</button>
+    <span style="font-size:11px;color:#aaa">Arrastra &#8942; para reordenar &nbsp;·&nbsp; SM / MD / LG / XL para cambiar tamaño</span>
+  </div>
+  <div class="dash-grid" id="dash-grid">
+<div class="panel size-full" id="panel-kpi" draggable="true" data-pid="kpi">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">KPIs del período</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('kpi','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('kpi','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('kpi','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('kpi','full')">XL</button>
+        </div>
+      </div>
+      <div class="kgrid" id="kpi-area"></div>
+    </div>
     <div class="two">
       <div class="section"><div class="stitle" id="meta-label">Meta mensual</div><div id="meta-area"></div></div>
       <div class="section"><div class="stitle">Proyecci&oacute;n del mes</div><div id="proy-area"></div></div>
     </div>
-    <div class="section">
-      <div class="stitle" style="display:flex;justify-content:space-between;align-items:center">
-        <span>Ventas por categor&iacute;a &mdash; <span id="cat-date"></span></span>
-        <span style="display:flex;gap:8px;font-size:10px">
-          <span style="color:#1D9E75;font-weight:700">&#9646; Dulcerna</span>
-          <span style="color:#D85A30;font-weight:700">&#9646; Pizzerna</span>
-        </span>
+<div class="panel size-full" id="panel-cats" draggable="true" data-pid="cats">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Ventas por categoría<span id="cat-date" style="font-weight:400;color:#888;text-transform:none;letter-spacing:0;font-family:var(--sans,sans-serif);font-size:12px"></span>&nbsp;<span style="margin-left:auto;display:flex;gap:8px;font-size:10px"><span style="color:#1D9E75;font-weight:700">■ Dulcerna</span><span style="color:#D85A30;font-weight:700">■ Pizzerna</span></span></div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('cats','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('cats','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('cats','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('cats','full')">XL</button>
+        </div>
       </div>
       <div id="cat-area"></div>
     </div>
-    <div class="section"><div class="stitle">Week over Week &mdash; semana actual vs semana anterior</div><div id="wow-area"></div></div>
-    <div class="section">
-      <div class="stitle">Ticket promedio por d&iacute;a &mdash; &uacute;ltimas 6 semanas vs semana actual</div>
+<div class="panel size-full" id="panel-wow" draggable="true" data-pid="wow">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Week over Week</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('wow','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('wow','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('wow','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('wow','full')">XL</button>
+        </div>
+      </div>
+      <div id="wow-area"></div>
+    </div>
+<div class="panel size-full" id="panel-dayavg" draggable="true" data-pid="dayavg">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Ticket promedio por día de la semana</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('dayavg','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('dayavg','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('dayavg','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('dayavg','full')">XL</button>
+        </div>
+      </div>
       <div class="day-grid" id="day-area"></div>
-      <div style="font-size:11px;color:#aaa;margin-top:10px;font-family:'IBM Plex Mono',monospace">Ticket = ventas totales / &oacute;rdenes. Las 6 semanas excluyen la semana actual.</div>
+      <div style="font-size:11px;color:#aaa;margin-top:10px;font-family:'IBM Plex Mono',monospace">Ticket = ventas / órdenes · Las 6 semanas excluyen la semana actual</div>
     </div>
 
-    <!-- VELOCIDAD DEL DÍA + CANAL DE PAGO -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-      <div class="section">
-        <div class="stitle">Canal de pago &mdash; per&iacute;odo actual</div>
-        <div id="payment-area"></div>
+<div class="panel size-md" id="panel-payments" draggable="true" data-pid="payments">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Canal de pago</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('payments','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('payments','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('payments','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('payments','full')">XL</button>
+        </div>
       </div>
-      <div class="section">
-        <div class="stitle">Alertas &mdash; categor&iacute;as fuera de rango</div>
-        <div id="alerts-area"></div>
+      <div id="payment-area"></div>
+    </div>
+    <div class="panel size-md" id="panel-alerts" draggable="true" data-pid="alerts">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Alertas — categorías fuera de rango</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('alerts','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('alerts','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('alerts','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('alerts','full')">XL</button>
+        </div>
       </div>
+      <div id="alerts-area"></div>
     </div>
 
-    <!-- TENDENCIA DE PRODUCTOS -->
-    <div class="section">
-      <div class="stitle">Productos en tendencia &mdash; top subiendo &amp; bajando vs promedio hist&oacute;rico</div>
+<div class="panel size-full" id="panel-trends" draggable="true" data-pid="trends">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Productos en tendencia</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('trends','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('trends','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('trends','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('trends','full')">XL</button>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" id="trend-area"></div>
     </div>
-    <!-- SEARCH BY PRODUCT / CATEGORY -->
-    <div class="section">
-      <div class="stitle">Buscar por producto o categor&iacute;a</div>
+<div class="panel size-full" id="panel-search" draggable="true" data-pid="search">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Buscar por producto o categoría</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('search','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('search','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('search','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('search','full')">XL</button>
+        </div>
+      </div>
+      
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <input type="text" id="search-global" class="tracker-search" style="flex:1;min-width:200px;margin-bottom:0" placeholder="Buscar producto o categoría..." oninput="renderSearch()"/>
         <select id="search-cat-filter" onchange="renderSearch()" style="font-family:'IBM Plex Mono',monospace;font-size:12px;padding:7px 10px;border:1px solid #c8c5bf;border-radius:6px;background:#fff;color:#333;cursor:pointer">
@@ -191,15 +286,26 @@ body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min
     </div>
 
     <!-- TRACKER -->
-    <div class="section">
-      <div class="stitle">Tracker de productos &mdash; selecciona hasta 10 para comparar</div>
+    <div class="panel size-full" id="panel-tracker" draggable="true" data-pid="tracker">
+      <div class="panel-header">
+        <span class="panel-drag" title="Arrastra para reordenar">&#8942;</span>
+        <div class="panel-title">Tracker de productos — hasta 10</div>
+        <div class="panel-actions">
+          <button class="panel-btn" onclick="resizePanel('tracker','sm')">SM</button>
+          <button class="panel-btn" onclick="resizePanel('tracker','md')">MD</button>
+          <button class="panel-btn active-size" onclick="resizePanel('tracker','lg')">LG</button>
+          <button class="panel-btn" onclick="resizePanel('tracker','full')">XL</button>
+        </div>
+      </div>
+      
       <input type="text" class="tracker-search" id="prod-search" placeholder="Buscar producto por nombre..." oninput="filterProds()"/>
       <div style="font-size:11px;color:#888;margin-bottom:8px">Seleccionados: <b id="sel-count">0</b> / 10</div>
       <div class="sel-tags" id="sel-tags"></div>
       <div class="prod-list" id="prod-list"></div>
       <div id="tracker-area" style="margin-top:16px"></div>
     </div>
-  </div>
+  </div><!-- end dash-grid -->
+</div><!-- end dash -->
 </div>
 
 <script>
@@ -218,7 +324,20 @@ function isPz(cat){return PZ_CATS.some(function(c){return cat&&cat.toUpperCase()
 
 function apiSales(ini,end){
   var url=BASE+'?endpoint=sales&ini='+ini+'&end='+end+'&'+P;
-  return fetch(url).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){return d.data||[];});
+  var controller=typeof AbortController!=='undefined'?new AbortController():null;
+  var timer=controller?setTimeout(function(){controller.abort();},25000):null;
+  var opts=controller?{signal:controller.signal}:{};
+  return fetch(url,opts).then(function(r){
+    if(timer)clearTimeout(timer);
+    if(!r.ok)throw new Error('HTTP '+r.status+' para '+ini+'-'+end);
+    return r.json();
+  }).then(function(d){
+    return d.data||[];
+  }).catch(function(e){
+    if(timer)clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('Timeout consultando '+ini+'-'+end+' (>25s). Intenta un rango menor.');
+    throw e;
+  });
 }
 
 function parseO(orders){
@@ -262,7 +381,7 @@ function renderMeta(mtd, fechaStr, histByDayForProy){
   var pM=Math.min(Math.round(mtd/META*100),100);
   var cM=pM>=100?'#16a34a':pM>=70?'#1D9E75':pM>=40?'#d97706':'#dc2626';
   var MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  document.getElementById('meta-label').textContent='Meta mensual — '+MN[m-1]+' '+y;
+  var mlx=document.getElementById('meta-label-extra');if(mlx)mlx.textContent=' — '+MN[m-1]+' '+y;
   document.getElementById('meta-area').innerHTML=
     '<div class="prog-label"><span>'+cop(mtd)+'</span><span>Meta: '+cop(META)+'</span></div>'
     +'<div class="prog-track"><div class="prog-fill" style="width:'+pM+'%;background:'+cM+'"><span>'+pM+'%</span></div></div>'
@@ -692,6 +811,11 @@ function renderTracker(){
   el.innerHTML=html;
 }
 
+function setLoadMsg(msg){
+  var el=document.querySelector('#st-load .state-sub');
+  if(el)el.textContent=msg;
+}
+
 async function loadAll(){
   document.getElementById('st-load').style.display='';
   document.getElementById('st-err').style.display='none';
@@ -699,47 +823,62 @@ async function loadAll(){
   var range=getRange();
   var iniDate=range.ini, endDate=range.end;
   var today=localToday();
-  var todayStr=localFmt(endDate);
-  // Update range label
+  var todayStr=localFmt(today);
   document.getElementById('range-label').textContent=dispRange(iniDate,endDate)+(activeDow>=0?' · Solo '+['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][activeDow]:'');
+
+  var rangeNames={'hoy':'hoy','ayer':'ayer','sem-actual':'semana actual','sem-ant':'semana anterior',
+    'mes-actual':'mes actual','mes-ant':'mes anterior','mes-2':'hace 2 meses','mes-3':'hace 3 meses','custom':'período'};
+
   try{
-    // Main range data
     var iniStr=localFmt(iniDate), endStr=localFmt(endDate);
+
+    // CALL 1: Main range
+    setLoadMsg('Cargando período seleccionado...');
     var mainData=await apiSales(iniStr,endStr);
     var filteredData=filterOrdersByDow(mainData);
 
-    // Current week & prev week for WoW
-    var ws=monStart(today),wsStr=localFmt(ws);
-    var cwData=await apiSales(wsStr,localFmt(today));
-    var pwS=addD(ws,-7),pwE=addD(ws,-1);
-    var pwData=await apiSales(localFmt(pwS),localFmt(pwE));
-
-    // 6 weeks history for day averages
+    // CALL 2: History = 6 weeks before current week (covers WoW + day averages)
+    // Use month start to today for MTD + last 6 weeks for history — one big call
+    var y=today.getFullYear(),mo=String(today.getMonth()+1).padStart(2,'0');
+    var ws=monStart(today);
     var h6S=addD(ws,-42);
-    var h6Data=await apiSales(localFmt(h6S),localFmt(addD(ws,-1)));
+    var histStartStr=localFmt(h6S);
+    // If month start is earlier than h6S, use month start
+    var mtdStartStr=y+mo+'01';
+    var bigStartStr=histStartStr<mtdStartStr?histStartStr:mtdStartStr;
+
+    setLoadMsg('Cargando histórico (últimas 6 semanas + mes actual)...');
+    var bigData=await apiSales(bigStartStr,todayStr);
+
+    // Split into histByDay and MTD
     histByDay={};
-    [...h6Data,...cwData].forEach(function(o){
+    var mtdTotal=0;
+    bigData.forEach(function(o){
       var d=(o.dateOpen||'').substr(0,10).replace(/-/g,'');
       if(!histByDay[d])histByDay[d]=[];
       histByDay[d].push(o);
+      // MTD: include if within current month
+      var oDate=d.substr(0,6); // YYYYMM
+      if(oDate===y+mo) mtdTotal+=(o.total||0);
     });
 
-    // MTD for meta
-    var y=today.getFullYear(),mo=String(today.getMonth()+1).padStart(2,'0');
-    var mtdData=await apiSales(y+mo+'01',localFmt(today));
-    var mtdS=parseO(mtdData);
+    // WoW: split from histByDay
+    var wsStr=localFmt(ws);
+    var pwS=addD(ws,-7),pwE=addD(ws,-1);
+    var cwOrders=[],pwOrders=[];
+    Object.keys(histByDay).forEach(function(d){
+      if(d>=wsStr&&d<=todayStr) cwOrders=cwOrders.concat(histByDay[d]);
+      else if(d>=localFmt(pwS)&&d<=localFmt(pwE)) pwOrders=pwOrders.concat(histByDay[d]);
+    });
+
     var mainS=parseO(filteredData);
 
-    // Update KPI label based on range
-    var rangeNames={'hoy':'hoy','ayer':'ayer','sem-actual':'semana actual','sem-ant':'semana anterior',
-      'mes-actual':'mes actual','mes-ant':'mes anterior','mes-2':'hace 2 meses','mes-3':'hace 3 meses','custom':'período'};
-    document.querySelectorAll('#kpi-area .kl')[0] && (document.querySelectorAll('#kpi-area .kl')[0].textContent='Ventas '+( rangeNames[activeRange]||'período'));
-
+    setLoadMsg('Renderizando dashboard...');
     renderKPI(mainS, rangeNames[activeRange]||'período');
-    renderMeta(mtdS.total,localFmt(today),histByDay);
+    renderMeta(mtdTotal,todayStr,histByDay);
     renderCats(mainS.catMap,iniStr,endStr);
-    renderWoW(cwData,pwData);
-    renderDayAvg(histByDay,localFmt(today));
+    renderWoW(cwOrders,pwOrders);
+    renderDayAvg(histByDay,todayStr);
     renderPayments(filteredData);
     renderAlerts(filteredData,histByDay);
     renderTrends(filteredData,histByDay);
@@ -747,8 +886,10 @@ async function loadAll(){
     renderTracker();
     document.getElementById('st-load').style.display='none';
     document.getElementById('dash').style.display='';
+    restoreLayout();
+
   }catch(e){
-    console.error(e);
+    console.error('loadAll error:',e);
     document.getElementById('st-load').style.display='none';
     document.getElementById('st-err').style.display='';
     document.getElementById('err-msg').textContent='Error: '+e.message;
@@ -836,6 +977,74 @@ document.getElementById('filter-days').addEventListener('click',function(e){
   activeDow=parseInt(b.dataset.dow);
   loadAll();
 });
+
+// ── DRAG & DROP PANELS ────────────────────────────────────────────────────────
+var dragPid=null;
+document.addEventListener('dragstart',function(e){
+  var p=e.target.closest('.panel[draggable]');if(!p)return;
+  dragPid=p.dataset.pid;
+  setTimeout(function(){p.classList.add('dragging');},0);
+  e.dataTransfer.effectAllowed='move';
+});
+document.addEventListener('dragend',function(){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('dragging','drag-over');});
+  saveLayout();dragPid=null;
+});
+document.addEventListener('dragover',function(e){
+  e.preventDefault();
+  var t=e.target.closest('.panel[draggable]');
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('drag-over');});
+  if(t&&t.dataset.pid!==dragPid)t.classList.add('drag-over');
+});
+document.addEventListener('drop',function(e){
+  e.preventDefault();
+  var t=e.target.closest('.panel[draggable]');
+  if(!t||!dragPid||t.dataset.pid===dragPid)return;
+  var grid=document.getElementById('dash-grid');
+  var src=document.getElementById('panel-'+dragPid);
+  var panels=Array.from(grid.querySelectorAll(':scope > .panel'));
+  var si=panels.indexOf(src),ti=panels.indexOf(t);
+  if(si<ti)grid.insertBefore(src,t.nextSibling);else grid.insertBefore(src,t);
+});
+
+function resizePanel(pid,size){
+  var p=document.getElementById('panel-'+pid);if(!p)return;
+  p.className=p.className.replace(/size-\w+/,'size-'+size);
+  p.querySelectorAll('.panel-btn').forEach(function(b){b.classList.remove('active-size');});
+  var btns=p.querySelectorAll('.panel-btn');
+  var map={sm:0,md:1,lg:2,full:3};
+  if(btns[map[size]])btns[map[size]].classList.add('active-size');
+  saveLayout();
+}
+
+function saveLayout(){
+  var grid=document.getElementById('dash-grid');if(!grid)return;
+  var state=Array.from(grid.querySelectorAll(':scope > .panel')).map(function(p){
+    var sz=(p.className.match(/size-(\w+)/)||[])[1]||'full';
+    return{pid:p.dataset.pid,size:sz};
+  });
+  try{localStorage.setItem('ninania-ventas-layout',JSON.stringify(state));}catch(e){}
+}
+
+function restoreLayout(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('ninania-ventas-layout')||'null');
+    if(!saved)return;
+    var grid=document.getElementById('dash-grid');if(!grid)return;
+    saved.forEach(function(item){
+      var p=document.getElementById('panel-'+item.pid);
+      if(p){grid.appendChild(p);resizePanel(item.pid,item.size||'full');}
+    });
+  }catch(e){}
+}
+
+function resetLayout(){
+  try{localStorage.removeItem('ninania-ventas-layout');}catch(e){}
+  location.reload();
+}
+
+// Update meta-label-extra
+var _origRenderMeta=renderMeta;
 
 (function(){
   var tf=document.getElementById('date-from'),tt=document.getElementById('date-to');
