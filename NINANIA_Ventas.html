@@ -719,16 +719,15 @@ function go() {
   document.getElementById('range-lbl').textContent =
     dispDate(ini) + (ini !== end ? ' a ' + dispDate(end) : '');
 
-  var lmsg = document.getElementById('load-msg');
-
-  // ── FASE 1: periodo seleccionado ─────────────────────────────────────────
-  lmsg.textContent = 'Cargando ' + (RNAMES[activeRange] || 'periodo') + '...';
+  // ── LLAMADA 1: periodo seleccionado ──────────────────────────────────────
+  document.getElementById('load-msg').textContent =
+    'Cargando ' + (RNAMES[activeRange] || 'periodo') + '...';
 
   fetchSales(ini, end)
     .then(function(mainData) {
       var filtered = activeDow === -1 ? mainData : mainData.filter(function(o) {
-        var d = new Date((o.dateOpen || '').substr(0, 10) + 'T12:00:00');
-        return d.getDay() === activeDow;
+        var dw = new Date((o.dateOpen || '').substr(0,10) + 'T12:00:00');
+        return dw.getDay() === activeDow;
       });
       var mainS = parseOrders(filtered);
 
@@ -737,87 +736,71 @@ function go() {
       renderPayments(mainS.payMap);
       renderCatChecks(mainS.prodMap);
 
-      document.getElementById('meta-area').innerHTML  = '<div class="empty" style="color:#d97706">Cargando meta...</div>';
-      document.getElementById('proy-area').innerHTML  = '<div class="empty" style="color:#d97706">Cargando proyeccion...</div>';
-      document.getElementById('wow-area').innerHTML   = '<div class="empty" style="color:#d97706">Cargando WoW...</div>';
-      document.getElementById('cmp-area').innerHTML   = '<div class="empty" style="color:#d97706">Cargando comparativo...</div>';
-      document.getElementById('alert-area').innerHTML = '<div class="empty" style="color:#d97706">Cargando alertas...</div>';
-      document.getElementById('dayavg-area').innerHTML = '<div class="empty" style="color:#d97706">Cargando ticket promedio...</div>';
+      // Placeholders
+      ['meta-area','proy-area','wow-area','cmp-area','alert-area','dayavg-area'].forEach(function(id) {
+        document.getElementById(id).innerHTML =
+          '<div class="empty" style="color:#d97706">&#8987; Cargando...</div>';
+      });
 
       document.getElementById('st-load').style.display = 'none';
       document.getElementById('dash').style.display    = '';
 
-      // ── FASE 2: ultimas 2 semanas para WoW + comparativo ───────────────
-      var ws   = weekMon(td);
-      var wkS0 = lfmt(addDays(ws, -14));
+      // ── LLAMADA 2: historico unico — cubre WoW (2 sem) + MTD (mes actual)
+      // Tomamos el mas antiguo entre: inicio del mes actual vs 14 dias atras
+      var ws    = weekMon(td);
+      var y     = td.getFullYear();
+      var mo    = pad2(td.getMonth() + 1);
+      var mtdS  = y + mo + '01';               // ej: "20260501"
+      var wkS   = lfmt(addDays(ws, -14));      // 2 semanas atras desde lunes
+      var histS = wkS < mtdS ? wkS : mtdS;    // el mas antiguo de los dos
 
-      lmsg.textContent = 'Cargando historico...';
+      document.getElementById('load-msg').textContent = 'Cargando historico...';
 
-      fetchSales(wkS0, tdStr)
+      fetchSales(histS, tdStr)
         .then(function(histData) {
           // Agrupar por dia
           var hbd = {};
+          var mtdTotal = 0;
           histData.forEach(function(o) {
-            var dk = (o.dateOpen || '').substr(0, 10).replace(/-/g, '');
+            var dk = (o.dateOpen || '').substr(0,10).replace(/-/g,'');
             if (!hbd[dk]) hbd[dk] = [];
             hbd[dk].push(o);
+            // Sumar MTD (solo dias del mes actual)
+            if (dk.substr(0,6) === y + mo) {
+              mtdTotal += (o.total || 0) + (o.discounts || 0) - (o.taxes || 0);
+            }
           });
 
-          // Rangos de cada semana
+          // Separar semanas para WoW
           var wsStr = lfmt(ws);
           var pw1S  = lfmt(addDays(ws,  -7));
           var pw1E  = lfmt(addDays(ws,  -1));
           var pw2S  = lfmt(addDays(ws, -14));
           var pw2E  = lfmt(addDays(ws,  -8));
-
-          var cw  = [];
-          var pw1 = [];
-          var pw2 = [];
-
+          var cw = [], pw1 = [], pw2 = [];
           Object.keys(hbd).forEach(function(dk) {
-            if      (dk >= wsStr && dk <= tdStr)  { cw  = cw.concat(hbd[dk]);  }
-            else if (dk >= pw1S  && dk <= pw1E)   { pw1 = pw1.concat(hbd[dk]); }
-            else if (dk >= pw2S  && dk <= pw2E)   { pw2 = pw2.concat(hbd[dk]); }
+            if      (dk >= wsStr && dk <= tdStr) { cw  = cw.concat(hbd[dk]);  }
+            else if (dk >= pw1S  && dk <= pw1E)  { pw1 = pw1.concat(hbd[dk]); }
+            else if (dk >= pw2S  && dk <= pw2E)  { pw2 = pw2.concat(hbd[dk]); }
           });
 
+          // Render todo
+          renderMeta(mtdTotal, tdStr, hbd);
+          renderDayAvg(hbd, tdStr);
           renderWoW(cw, pw1, pw2);
           renderCompare(hbd, tdStr);
           renderAlerts(mainS, hbd);
         })
         .catch(function(e2) {
-          console.warn('Fase 2 fallo:', e2.message);
-          document.getElementById('wow-area').innerHTML =
-            '<div class="empty" style="color:#dc2626">No se pudo cargar historico: ' + e2.message + '</div>';
-        });
-
-      // ── FASE 3: mes actual para meta + proyeccion + ticket x dia ────────
-      var y  = td.getFullYear();
-      var mo = pad2(td.getMonth() + 1);
-      var mtdIni = y + mo + '01';
-
-      fetchSales(mtdIni, tdStr)
-        .then(function(mtdData) {
-          var mtdHist  = {};
-          var mtdTotal = 0;
-          mtdData.forEach(function(order) {
-            var dk = (order.dateOpen || '').substr(0, 10).replace(/-/g, '');
-            if (!mtdHist[dk]) mtdHist[dk] = [];
-            mtdHist[dk].push(order);
-            mtdTotal += (order.total || 0) + (order.discounts || 0) - (order.taxes || 0);
+          console.error('Historico fallo:', e2);
+          ['meta-area','proy-area','wow-area','cmp-area','alert-area','dayavg-area'].forEach(function(id) {
+            document.getElementById(id).innerHTML =
+              '<div class="empty" style="color:#dc2626">Error historico: ' + e2.message + '</div>';
           });
-          renderMeta(mtdTotal, tdStr, mtdHist);
-          renderDayAvg(mtdHist, tdStr);
-        })
-        .catch(function(e3) {
-          console.warn('Fase 3 fallo:', e3.message);
-          document.getElementById('meta-area').innerHTML =
-            '<div class="empty" style="color:#dc2626">No se pudo cargar meta: ' + e3.message + '</div>';
-          document.getElementById('proy-area').innerHTML =
-            '<div class="empty" style="color:#dc2626">No se pudo cargar proyeccion</div>';
         });
     })
     .catch(function(e) {
-      console.error('Fase 1 fallo:', e.message);
+      console.error('Carga principal fallo:', e);
       document.getElementById('st-load').style.display = 'none';
       document.getElementById('st-err').style.display  = '';
       document.getElementById('err-msg').textContent   = 'Error: ' + e.message;
