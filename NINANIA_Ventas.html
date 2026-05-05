@@ -14,7 +14,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min
 .back{display:flex;align-items:center;gap:6px;color:#888;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;border:1px solid #c8c5bf;border-radius:6px;padding:5px 12px;text-decoration:none;transition:all .2s}
 .back:hover{color:#1a1a1a;border-color:#888}
 .tb-title{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#4a4a4a;letter-spacing:.08em}
-.tb-file{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa}
+.tb-file{margin-left:auto;font-family:var(--m);font-size:10px;color:#aaa}
 
 /* ── FILTERBAR ── */
 .filterbar{background:#fff;border-bottom:1px solid #dddad4;padding:12px 20px;position:sticky;top:54px;z-index:100}
@@ -45,7 +45,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min
 
 /* ── LAYOUT BAR ── */
 .layout-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.layout-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.06em}
+.layout-lbl{font-family:var(--m);font-size:10px;color:#aaa;letter-spacing:.06em}
 .layout-reset{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 10px;border:1px solid #dddad4;border-radius:4px;background:#f7f5f0;color:#888;cursor:pointer;transition:all .15s}
 .layout-reset:hover{border-color:#888;color:#333}
 .layout-hint{font-size:11px;color:#bbb}
@@ -278,7 +278,15 @@ select.cat-sel{font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 
 </div><!-- body -->
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+function toggleOtros(btn, id){
+  var e=document.getElementById(id);
+  if(!e)return;
+  var open=e.style.display!=='none';
+  e.style.display=open?'none':'block';
+  var lbl=btn.querySelector('.bl');
+  if(lbl) lbl.textContent=lbl.textContent.replace(open?'\u25be':'\u25b8',open?'\u25b8':'\u25be');
+}
 var PROXY = '/.netlify/functions/toteat';
 var API_P = 'xir=4902138748207104&xil=9&xiu=1001&xapitoken=5X4PaCSlPFjMVzG0q2lEiOnrpyBb6Km8';
 var META  = 850000000;
@@ -441,12 +449,12 @@ function renderMeta(mtd, todayStr, hist){
     if(avg&&Math.abs(trend)>0.02){ tStr=(trend>0?'↑ +':'↓ ')+Math.round(Math.abs(trend)*100)+'%'; tCl=trend>0?'up':'dn'; }
     var title='Últimas '+dowVals[dow].length+' ocurrencias';
     dowHtml+='<div style="background:#f7f5f0;border:1px solid #dddad4;border-radius:6px;padding:7px 4px;text-align:center" title="'+title+'">'
-      +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;color:#aaa;text-transform:uppercase;margin-bottom:3px">'+DNAMES[dow]+'</div>'
+      +'<div style="font-family:monospace;font-size:9px;color:#aaa;text-transform:uppercase;margin-bottom:3px">'+DNAMES[dow]+'</div>'
       +'<div style="font-size:12px;font-weight:700;color:'+(avg?'#1a1a1a':'#ccc')+'">'+(avg?cop(avg):'—')+'</div>'
       +(tStr?'<div class="'+tCl+'" style="font-size:9px;font-weight:700;margin-top:2px">'+tStr+'</div>':'')
       +'</div>';
   });
-  dowHtml+='</div><div style="font-size:10px;color:#aaa;margin-top:6px;font-family:\'IBM Plex Mono\',monospace">Ponderación: más reciente = más peso · ↑↓ = tendencia últimas 2 vs anteriores</div>';
+  dowHtml+='</div><div style="font-size:10px;color:#aaa;margin-top:6px;font-family:monospace">Ponderación: más reciente = más peso · ↑↓ = tendencia últimas 2 vs anteriores</div>';
 
   document.getElementById('proy-area').innerHTML=
     '<div class="prog-lbl"><span>Proy: '+cop(proy)+'</span><span>Día '+d+'/'+totalDias+'</span></div>'
@@ -477,8 +485,8 @@ function renderCats(catMap, ini, end){
     var smallPct=(smallTotal/total*100).toFixed(1);
     var smallId='otros-'+Date.now();
     html+='<div style="margin-top:8px">'
-      +'<div class="br" style="cursor:pointer" onclick="var e=document.getElementById(''+smallId+'');e.style.display=e.style.display==='none'?'block':'none'">'
-      +'<div class="bl" style="color:#888;font-style:italic">Otros ('+small.length+' categorías) ▸</div>'
+      +'<div class="br" style="cursor:pointer" onclick="toggleOtros(this,\''+smallId+'\')">'
+      +'<div class="bl" style="color:#888;font-style:italic">Otros ('+small.length+' categor\u00edas) \u25b8</div>'
       +'<div class="bt"><div class="bf" style="width:'+Math.max(Math.round(smallTotal/maxV*100),2)+'%;background:#dddad4"><span style="color:#666">'+cop(smallTotal)+'</span></div></div>'
       +'<div class="bsub" style="color:#aaa">'+smallPct+'%</div></div>'
       +'<div id="'+smallId+'" style="display:none;background:#f7f5f0;border-radius:6px;padding:10px;margin-top:4px">'
@@ -522,20 +530,20 @@ function renderCompare(hist, todayStr){
   var avgDow=sameDow.length?sameDow.reduce(function(a,b){return a+b;},0)/sameDow.length:0;
 
   function card(title, curr, avg, avgLabel, note){
-    if(!curr&&!avg){return'<div style="background:#f7f5f0;border:1px solid #dddad4;border-radius:8px;padding:14px"><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:10px">'+title+'</div><div class="empty">Sin datos disponibles</div></div>';}
+    if(!curr&&!avg){return'<div style="background:#f7f5f0;border:1px solid #dddad4;border-radius:8px;padding:14px"><div style="font-family:var(--m);font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:10px">'+title+'</div><div class="empty">Sin datos disponibles</div></div>';}
     var pct=avg>0?(curr-avg)/avg*100:0;
     var isUp=pct>=0, col=isUp?'#16a34a':'#dc2626', sign=isUp?'+':'';
     var barW=avg>0?Math.min(Math.round(curr/avg*100),150):0;
     var barCol=isUp?'#1D9E75':'#dc2626';
     return '<div style="background:#f7f5f0;border:1px solid #dddad4;border-radius:8px;padding:14px">'
-      +'<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:12px">'+title+'</div>'
+      +'<div style="font-family:monospace;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:12px">'+title+'</div>'
       +'<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">'
       +'<div style="font-size:26px;font-weight:700;color:#1a1a1a">'+cop(curr)+'</div>'
       +'<div style="font-size:18px;font-weight:700;color:'+col+'">'+sign+pct.toFixed(1)+'%</div>'
       +'</div>'
       +'<div style="font-size:12px;color:#888;margin-bottom:8px">vs '+avgLabel+': '+cop(avg)+'</div>'
       +'<div class="bt" style="height:12px;margin-bottom:8px"><div class="bf" style="width:'+Math.min(barW,100)+'%;background:'+barCol+';height:100%;border-radius:3px"><span style="font-size:0">.</span></div></div>'
-      +'<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa">'+note+'</div>'
+      +'<div style="font-family:var(--m);font-size:10px;color:#aaa">'+note+'</div>'
       +'</div>';
   }
   el.innerHTML=
@@ -634,7 +642,7 @@ function renderAlerts(orders, hist){
   });
   alerts.sort(function(a,b){return Math.abs(b.pct)-Math.abs(a.pct);});
   if(!alerts.length){
-    document.getElementById('alerts-area').innerHTML='<div style="font-size:13px;color:#16a34a;padding:12px;text-align:center;font-family:\'IBM Plex Mono\',monospace">✓ Todo dentro del rango normal</div>';
+    document.getElementById('alerts-area').innerHTML='<div style="font-size:13px;color:#16a34a;padding:12px;text-align:center;font-family:monospace">✓ Todo dentro del rango normal</div>';
     return;
   }
   document.getElementById('alerts-area').innerHTML=alerts.slice(0,8).map(function(a){
@@ -669,13 +677,13 @@ function renderTrends(orders, hist){
   var rising=trends.filter(function(t){return t.pct>15;}).sort(function(a,b){return b.pct-a.pct;}).slice(0,6);
   var falling=trends.filter(function(t){return t.pct<-15;}).sort(function(a,b){return a.pct-b.pct;}).slice(0,6);
   var mxR=rising[0]?rising[0].pct:100, mxF=falling[0]?Math.abs(falling[0].pct):100;
-  var html='<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:700;color:#16a34a;letter-spacing:.08em;margin-bottom:8px">↑ SUBIENDO</div>';
+  var html='<div><div style="font-family:monospace;font-size:11px;font-weight:700;color:#16a34a;letter-spacing:.08em;margin-bottom:8px">↑ SUBIENDO</div>';
   if(!rising.length) html+='<div class="empty">Sin productos en alza significativa</div>';
   rising.forEach(function(t){
     var w=Math.max(Math.round(t.pct/mxR*100),4);
     html+='<div class="br"><div class="bl" title="'+t.prod+'">'+t.prod+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:#1D9E75"><span>+'+Math.round(t.pct)+'%</span></div></div><div class="bsub up">'+cop(t.curr)+'</div></div>';
   });
-  html+='</div><div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:700;color:#dc2626;letter-spacing:.08em;margin-bottom:8px">↓ BAJANDO</div>';
+  html+='</div><div><div style="font-family:monospace;font-size:11px;font-weight:700;color:#dc2626;letter-spacing:.08em;margin-bottom:8px">↓ BAJANDO</div>';
   if(!falling.length) html+='<div class="empty">Sin productos en baja significativa</div>';
   falling.forEach(function(t){
     var w=Math.max(Math.round(Math.abs(t.pct)/mxF*100),4);
@@ -703,7 +711,7 @@ function renderSearch(){
     var pzCat=isPz(cat), cc=pzCat?'#D85A30':'#1D9E75';
     html+='<div style="margin-bottom:14px">'
       +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f0ede8">'
-      +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:700;color:'+cc+';letter-spacing:.06em;text-transform:uppercase">'+cat+'</div>'
+      +'<div style="font-family:monospace;font-size:11px;font-weight:700;color:'+cc+';letter-spacing:.06em;text-transform:uppercase">'+cat+'</div>'
       +'<div style="font-size:13px;font-weight:600;color:#333">'+cop(catTotal)+'</div>'
       +'<div style="font-size:11px;color:#aaa">'+Math.round(catTotal/(grand||1)*100)+'% total</div>'
       +'</div>';
@@ -769,7 +777,7 @@ function renderTracker(){
     var pc=Math.round(p.rev/(catT||1)*100), pg=Math.round(p.rev/(grand||1)*100);
     var cc=isPz(p.cat)?'#D85A30':'#1D9E75';
     return '<div style="margin-bottom:12px;padding:12px;background:#f7f5f0;border-radius:8px;border:1px solid #dddad4">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:600">'+name+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:#aaa">'+p.cat+'</div></div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:600">'+name+'</div><div style="font-family:monospace;font-size:10px;color:#aaa">'+p.cat+'</div></div>'
       +'<div class="br"><div class="bl" style="width:120px">Este producto</div><div class="bt"><div class="bf" style="width:'+Math.min(pc*2,100)+'%;background:'+cc+'"><span>'+cop(p.rev)+' · '+p.qty+' uds</span></div></div><div class="bsub" style="color:'+cc+';font-weight:700">'+pc+'% cat</div></div>'
       +'<div class="br"><div class="bl" style="width:120px">Resto categoría</div><div class="bt"><div class="bf" style="width:100%;background:#dddad4"><span style="color:#555">'+cop(catT-p.rev)+'</span></div></div><div class="bsub">'+pg+'% total</div></div>'
       +'</div>';
