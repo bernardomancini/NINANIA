@@ -1,2 +1,5 @@
 [functions]
   directory = "netlify/functions"
+
+[functions.toteat]
+  timeout = 26
