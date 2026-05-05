@@ -734,8 +734,8 @@ function go() {
 
       // Phase 2: load 14-day history for WoW + compare (background)
       var ws = weekMon(td);
-      var histIni = lfmt(addDays(ws, -7));
-      lmsg.textContent = 'Cargando historico (WoW)...';
+      var histIni = lfmt(addDays(ws, -14));
+      lmsg.textContent = 'Cargando historico...';
       fetchSales(histIni, tdStr)
         .then(function(histData) {
           var histByDay = {};
@@ -744,11 +744,16 @@ function go() {
             if (!histByDay[dk]) histByDay[dk] = [];
             histByDay[dk].push(o);
           });
-          var wsStr = lfmt(ws), pwS = lfmt(addDays(ws,-7)), pwE = lfmt(addDays(ws,-1));
-          var cw = [], pw = [];
+          var wsStr = lfmt(ws);
+          var pwS  = lfmt(addDays(ws,-7));
+          var pwE  = lfmt(addDays(ws,-1));
+          var pw2S = lfmt(addDays(ws,-14));
+          var pw2E = lfmt(addDays(ws,-8));
+          var cw = [], pw = [], pw2 = [];
           Object.keys(histByDay).forEach(function(dk) {
-            if (dk >= wsStr && dk <= tdStr) cw = cw.concat(histByDay[dk]);
-            else if (dk >= pwS && dk <= pwE) pw = pw.concat(histByDay[dk]);
+            if (dk >= wsStr && dk <= tdStr)    { cw  = cw.concat(histByDay[dk]);  }
+            else if (dk >= pwS  && dk <= pwE)  { pw  = pw.concat(histByDay[dk]);  }
+            else if (dk >= pw2S && dk <= pw2E) { pw2 = pw2.concat(histByDay[dk]); }
           });
           renderWoW(cw, pw, pw2);
           renderCompare(histByDay, tdStr);
