@@ -700,99 +700,127 @@ function renderAlerts(mainS, histByDay) {
 
 // ── MAIN LOAD ─────────────────────────────────────────────────────────────────
 function go() {
-  var stLoad = document.getElementById('st-load');
-  var stErr  = document.getElementById('st-err');
-  var dash   = document.getElementById('dash');
-  stLoad.style.display = '';
-  stErr.style.display = 'none';
-  dash.style.display = 'none';
+  document.getElementById('st-load').style.display = '';
+  document.getElementById('st-err').style.display  = 'none';
+  document.getElementById('dash').style.display    = 'none';
 
   var range = getRange();
-  var ini = lfmt(range.ini), end = lfmt(range.end);
-  var td = localToday(), tdStr = lfmt(td);
-  var RNAMES = {hoy:'hoy',ayer:'ayer','sem-act':'semana actual','sem-ant':'semana anterior','mes-act':'mes actual','mes-ant':'mes anterior','mes-2':'hace 2 meses','mes-3':'hace 3 meses',custom:'periodo'};
-  document.getElementById('range-lbl').textContent = dispDate(ini) + (ini !== end ? ' a ' + dispDate(end) : '');
+  var ini   = lfmt(range.ini);
+  var end   = lfmt(range.end);
+  var td    = localToday();
+  var tdStr = lfmt(td);
+
+  var RNAMES = {
+    hoy:'hoy', ayer:'ayer', 'sem-act':'semana actual', 'sem-ant':'semana anterior',
+    'mes-act':'mes actual', 'mes-ant':'mes anterior',
+    'mes-2':'hace 2 meses', 'mes-3':'hace 3 meses', custom:'periodo'
+  };
+
+  document.getElementById('range-lbl').textContent =
+    dispDate(ini) + (ini !== end ? ' a ' + dispDate(end) : '');
 
   var lmsg = document.getElementById('load-msg');
 
-  // Phase 1: load selected range
+  // ── FASE 1: periodo seleccionado ─────────────────────────────────────────
   lmsg.textContent = 'Cargando ' + (RNAMES[activeRange] || 'periodo') + '...';
+
   fetchSales(ini, end)
     .then(function(mainData) {
       var filtered = activeDow === -1 ? mainData : mainData.filter(function(o) {
-        var d = new Date((o.dateOpen || '').substr(0,10) + 'T12:00:00');
+        var d = new Date((o.dateOpen || '').substr(0, 10) + 'T12:00:00');
         return d.getDay() === activeDow;
       });
       var mainS = parseOrders(filtered);
+
       renderKPI(mainS, RNAMES[activeRange] || 'periodo');
       renderCats(mainS.catMap, ini, end);
       renderPayments(mainS.payMap);
       renderCatChecks(mainS.prodMap);
 
-      stLoad.style.display = 'none';
-      dash.style.display = '';
+      document.getElementById('meta-area').innerHTML  = '<div class="empty" style="color:#d97706">Cargando meta...</div>';
+      document.getElementById('proy-area').innerHTML  = '<div class="empty" style="color:#d97706">Cargando proyeccion...</div>';
+      document.getElementById('wow-area').innerHTML   = '<div class="empty" style="color:#d97706">Cargando WoW...</div>';
+      document.getElementById('cmp-area').innerHTML   = '<div class="empty" style="color:#d97706">Cargando comparativo...</div>';
+      document.getElementById('alert-area').innerHTML = '<div class="empty" style="color:#d97706">Cargando alertas...</div>';
+      document.getElementById('dayavg-area').innerHTML = '<div class="empty" style="color:#d97706">Cargando ticket promedio...</div>';
 
-      // Phase 2: load 14-day history for WoW + compare (background)
-      var ws = weekMon(td);
-      var histIni = lfmt(addDays(ws, -14));
+      document.getElementById('st-load').style.display = 'none';
+      document.getElementById('dash').style.display    = '';
+
+      // ── FASE 2: ultimas 2 semanas para WoW + comparativo ───────────────
+      var ws   = weekMon(td);
+      var wkS0 = lfmt(addDays(ws, -14));
+
       lmsg.textContent = 'Cargando historico...';
-      fetchSales(histIni, tdStr)
-        .then(function(histData) {
-          var histByDay = {};
-          histData.forEach(function(o) {
-            var dk = (o.dateOpen || '').substr(0,10).replace(/-/g,'');
-            if (!histByDay[dk]) histByDay[dk] = [];
-            histByDay[dk].push(o);
-          });
-          var wsStr = lfmt(ws);
-          var pwS  = lfmt(addDays(ws,-7));
-          var pwE  = lfmt(addDays(ws,-1));
-          var pw2S = lfmt(addDays(ws,-14));
-          var pw2E = lfmt(addDays(ws,-8));
-          var cw = [], pw = [], pw2 = [];
-          Object.keys(histByDay).forEach(function(dk) {
-            if (dk >= wsStr && dk <= tdStr)    { cw  = cw.concat(histByDay[dk]);  }
-            else if (dk >= pwS  && dk <= pwE)  { pw  = pw.concat(histByDay[dk]);  }
-            else if (dk >= pw2S && dk <= pw2E) { pw2 = pw2.concat(histByDay[dk]); }
-          });
-          renderWoW(cw, pw, pw2);
-          renderCompare(histByDay, tdStr);
-          renderAlerts(mainS, histByDay);
 
-          // Phase 3: MTD for meta + projection
-          var y = td.getFullYear(), mo = pad2(td.getMonth()+1);
-          var mtdIni = y + mo + '01';
-          fetchSales(mtdIni, tdStr)
-            .then(function(mtdData) {
-              var mtdHist = {};
-              var mtdTotal = 0;
-              mtdData.forEach(function(o) {
-                var dk = (o.dateOpen || '').substr(0,10).replace(/-/g,'');
-                if (!mtdHist[dk]) mtdHist[dk] = [];
-                mtdHist[dk].push(o);
-                mtdTotal += ((o.total||0) + (o.discounts||0) - (o.taxes||0));
-              });
-              // merge
-              Object.keys(histByDay).forEach(function(dk) { if (!mtdHist[dk]) mtdHist[dk] = histByDay[dk]; });
-              renderMeta(mtdTotal, tdStr, mtdHist);
-              renderDayAvg(mtdHist, tdStr);
-            })
-            .catch(function(e3) {
-              console.warn('MTD failed:', e3.message);
-              document.getElementById('meta-area').innerHTML = '<div class="empty">No se pudo cargar meta: '+e3.message+'</div>';
-              document.getElementById('proy-area').innerHTML = '<div class="empty">No se pudo cargar proyeccion</div>';
-            });
+      fetchSales(wkS0, tdStr)
+        .then(function(histData) {
+          // Agrupar por dia
+          var hbd = {};
+          histData.forEach(function(o) {
+            var dk = (o.dateOpen || '').substr(0, 10).replace(/-/g, '');
+            if (!hbd[dk]) hbd[dk] = [];
+            hbd[dk].push(o);
+          });
+
+          // Rangos de cada semana
+          var wsStr = lfmt(ws);
+          var pw1S  = lfmt(addDays(ws,  -7));
+          var pw1E  = lfmt(addDays(ws,  -1));
+          var pw2S  = lfmt(addDays(ws, -14));
+          var pw2E  = lfmt(addDays(ws,  -8));
+
+          var cw  = [];
+          var pw1 = [];
+          var pw2 = [];
+
+          Object.keys(hbd).forEach(function(dk) {
+            if      (dk >= wsStr && dk <= tdStr)  { cw  = cw.concat(hbd[dk]);  }
+            else if (dk >= pw1S  && dk <= pw1E)   { pw1 = pw1.concat(hbd[dk]); }
+            else if (dk >= pw2S  && dk <= pw2E)   { pw2 = pw2.concat(hbd[dk]); }
+          });
+
+          renderWoW(cw, pw1, pw2);
+          renderCompare(hbd, tdStr);
+          renderAlerts(mainS, hbd);
         })
         .catch(function(e2) {
-          console.warn('History failed:', e2.message);
-          document.getElementById('wow-area').innerHTML = '<div class="empty">No se pudo cargar historico: '+e2.message+'</div>';
+          console.warn('Fase 2 fallo:', e2.message);
+          document.getElementById('wow-area').innerHTML =
+            '<div class="empty" style="color:#dc2626">No se pudo cargar historico: ' + e2.message + '</div>';
+        });
+
+      // ── FASE 3: mes actual para meta + proyeccion + ticket x dia ────────
+      var y  = td.getFullYear();
+      var mo = pad2(td.getMonth() + 1);
+      var mtdIni = y + mo + '01';
+
+      fetchSales(mtdIni, tdStr)
+        .then(function(mtdData) {
+          var mtdHist  = {};
+          var mtdTotal = 0;
+          mtdData.forEach(function(order) {
+            var dk = (order.dateOpen || '').substr(0, 10).replace(/-/g, '');
+            if (!mtdHist[dk]) mtdHist[dk] = [];
+            mtdHist[dk].push(order);
+            mtdTotal += (order.total || 0) + (order.discounts || 0) - (order.taxes || 0);
+          });
+          renderMeta(mtdTotal, tdStr, mtdHist);
+          renderDayAvg(mtdHist, tdStr);
+        })
+        .catch(function(e3) {
+          console.warn('Fase 3 fallo:', e3.message);
+          document.getElementById('meta-area').innerHTML =
+            '<div class="empty" style="color:#dc2626">No se pudo cargar meta: ' + e3.message + '</div>';
+          document.getElementById('proy-area').innerHTML =
+            '<div class="empty" style="color:#dc2626">No se pudo cargar proyeccion</div>';
         });
     })
     .catch(function(e) {
-      console.error('Main load failed:', e);
-      stLoad.style.display = 'none';
-      stErr.style.display = '';
-      document.getElementById('err-msg').textContent = 'Error: ' + e.message;
+      console.error('Fase 1 fallo:', e.message);
+      document.getElementById('st-load').style.display = 'none';
+      document.getElementById('st-err').style.display  = '';
+      document.getElementById('err-msg').textContent   = 'Error: ' + e.message;
     });
 }
 
