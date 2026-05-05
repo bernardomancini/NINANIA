@@ -245,6 +245,11 @@ select.cat-sel{font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 
         <div id="alerts-area"></div>
       </div>
 
+      <div class="panel sz-xl" id="p-compare" draggable="true" data-pid="compare">
+        <div class="ph"><span class="ph-drag">&#8942;</span><span class="ph-title">Comparativo de rendimiento</span><div class="ph-sizes"><button class="sz-btn" onclick="rsz('compare','sm')">SM</button><button class="sz-btn" onclick="rsz('compare','md')">MD</button><button class="sz-btn" onclick="rsz('compare','lg')">LG</button><button class="sz-btn on" onclick="rsz('compare','xl')">XL</button></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" id="compare-area"></div>
+      </div>
+
       <div class="panel sz-xl" id="p-trends" draggable="true" data-pid="trends">
         <div class="ph"><span class="ph-drag">&#8942;</span><span class="ph-title">Productos en tendencia</span><div class="ph-sizes"><button class="sz-btn" onclick="rsz('trends','sm')">SM</button><button class="sz-btn" onclick="rsz('trends','md')">MD</button><button class="sz-btn" onclick="rsz('trends','lg')">LG</button><button class="sz-btn on" onclick="rsz('trends','xl')">XL</button></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" id="trends-area"></div>
@@ -446,7 +451,7 @@ function renderMeta(mtd, todayStr, hist){
   document.getElementById('proy-area').innerHTML=
     '<div class="prog-lbl"><span>Proy: '+cop(proy)+'</span><span>Día '+d+'/'+totalDias+'</span></div>'
     +'<div class="prog-track"><div class="prog-fill" style="width:'+Math.min(pP,100)+'%;background:'+cP+'"><span>'+Math.round(proy/1e6)+'M</span></div></div>'
-    +'<div class="prog-note">'+diffTxt+' &nbsp;·&nbsp; '+totalDias-d+' días restantes</div>'
+    +'<div class="prog-note">'+diffTxt+' &nbsp;·&nbsp; '+(totalDias-d)+' días restantes</div>'
     +dowHtml;
 }
 
@@ -456,18 +461,88 @@ function renderCats(catMap, ini, end){
   var items=Object.keys(catMap).map(function(c){return{n:c,v:catMap[c]};}).sort(function(a,b){return b.v-a.v;});
   var total=items.reduce(function(s,i){return s+i.v;},0);
   var maxV=items[0]?items[0].v:1;
-  document.getElementById('cat-area').innerHTML=items.map(function(it){
+  // Split: show >=1%, group <1%
+  var main=[], small=[];
+  items.forEach(function(it){ var pt=it.v/total*100; if(pt>=1)main.push(it); else small.push(it); });
+  function barHtml(it){
     var pz=isPz(it.n), col=pz?'#D85A30':'#1D9E75', colL=pz?'#F0997B':'#7DCBB8';
-    var pw=Math.max(Math.round(it.v/maxV*100),3), pt=Math.round(it.v/total*100||0);
-    return '<div class="br">'
-      +'<div class="bl" title="'+it.n+'">'+it.n+'</div>'
+    var pw=Math.max(Math.round(it.v/maxV*100),3), pt=(it.v/total*100).toFixed(1);
+    return '<div class="br"><div class="bl" title="'+it.n+'">'+it.n+'</div>'
       +'<div class="bt"><div class="bf" style="width:'+pw+'%;background:'+(it.v===maxV?col:colL)+'"><span>'+cop(it.v)+'</span></div></div>'
-      +'<div class="bsub">'+pt+'%'+(pz?' <span style="color:#D85A30;font-size:9px;font-weight:700">PZ</span>':'')+'</div>'
-      +'</div>';
-  }).join('');
+      +'<div class="bsub">'+pt+'%'+(pz?' <span style="color:#D85A30;font-size:9px;font-weight:700">PZ</span>':'')+'</div></div>';
+  }
+  var html=main.map(barHtml).join('');
+  if(small.length){
+    var smallTotal=small.reduce(function(s,i){return s+i.v;},0);
+    var smallPct=(smallTotal/total*100).toFixed(1);
+    var smallId='otros-'+Date.now();
+    html+='<div style="margin-top:8px">'
+      +'<div class="br" style="cursor:pointer" onclick="var e=document.getElementById(''+smallId+'');e.style.display=e.style.display==='none'?'block':'none'">'
+      +'<div class="bl" style="color:#888;font-style:italic">Otros ('+small.length+' categorías) ▸</div>'
+      +'<div class="bt"><div class="bf" style="width:'+Math.max(Math.round(smallTotal/maxV*100),2)+'%;background:#dddad4"><span style="color:#666">'+cop(smallTotal)+'</span></div></div>'
+      +'<div class="bsub" style="color:#aaa">'+smallPct+'%</div></div>'
+      +'<div id="'+smallId+'" style="display:none;background:#f7f5f0;border-radius:6px;padding:10px;margin-top:4px">'
+      +small.map(barHtml).join('')+'</div></div>';
+  }
+  document.getElementById('cat-area').innerHTML=html;
 }
 
 // ── RENDER WoW ────────────────────────────────────────────────────────────────
+function renderCompare(hist, todayStr){
+  var el=document.getElementById('compare-area');
+  if(!el)return;
+  var DNAMES=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var t=new Date(parseInt(todayStr.substr(0,4)),parseInt(todayStr.substr(4,2))-1,parseInt(todayStr.substr(6,2)));
+  var todayDow=t.getDay();
+  var ayer=new Date(t); ayer.setDate(ayer.getDate()-1);
+  var ayerStr=lf(ayer);
+
+  // Get today's data and yesterday's data
+  var todayOrders=hist[todayStr]||[];
+  var ayerOrders=hist[ayerStr]||[];
+  var todayS=parseO(todayOrders);
+  var ayerS=parseO(ayerOrders);
+
+  // Last 5 days (excluding today)
+  var last5=[]; var keys=Object.keys(hist).sort().reverse();
+  for(var i=0;i<keys.length&&last5.length<5;i++){
+    if(keys[i]<todayStr){ var s=parseO(hist[keys[i]]); if(s.total>0)last5.push(s.total); }
+  }
+  var avg5=last5.length?last5.reduce(function(a,b){return a+b;},0)/last5.length:0;
+
+  // Last 6 same weekday
+  var sameDow=[]; var dowName=DNAMES[todayDow];
+  for(var i=0;i<keys.length&&sameDow.length<6;i++){
+    if(keys[i]<todayStr){
+      var dk=keys[i];
+      var dt=new Date(parseInt(dk.substr(0,4)),parseInt(dk.substr(4,2))-1,parseInt(dk.substr(6,2)));
+      if(dt.getDay()===todayDow){ var s2=parseO(hist[dk]); if(s2.total>0)sameDow.push(s2.total); }
+    }
+  }
+  var avgDow=sameDow.length?sameDow.reduce(function(a,b){return a+b;},0)/sameDow.length:0;
+
+  function card(title, curr, avg, avgLabel, note){
+    if(!curr&&!avg){return'<div style="background:#f7f5f0;border:1px solid #dddad4;border-radius:8px;padding:14px"><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:10px">'+title+'</div><div class="empty">Sin datos disponibles</div></div>';}
+    var pct=avg>0?(curr-avg)/avg*100:0;
+    var isUp=pct>=0, col=isUp?'#16a34a':'#dc2626', sign=isUp?'+':'';
+    var barW=avg>0?Math.min(Math.round(curr/avg*100),150):0;
+    var barCol=isUp?'#1D9E75':'#dc2626';
+    return '<div style="background:#f7f5f0;border:1px solid #dddad4;border-radius:8px;padding:14px">'
+      +'<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:12px">'+title+'</div>'
+      +'<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">'
+      +'<div style="font-size:26px;font-weight:700;color:#1a1a1a">'+cop(curr)+'</div>'
+      +'<div style="font-size:18px;font-weight:700;color:'+col+'">'+sign+pct.toFixed(1)+'%</div>'
+      +'</div>'
+      +'<div style="font-size:12px;color:#888;margin-bottom:8px">vs '+avgLabel+': '+cop(avg)+'</div>'
+      +'<div class="bt" style="height:12px;margin-bottom:8px"><div class="bf" style="width:'+Math.min(barW,100)+'%;background:'+barCol+';height:100%;border-radius:3px"><span style="font-size:0">.</span></div></div>'
+      +'<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#aaa">'+note+'</div>'
+      +'</div>';
+  }
+  el.innerHTML=
+    card('Hoy vs promedio '+dowName+' (6 sem.)', todayS.total, avgDow, 'prom. '+dowName, 'Últimas '+sameDow.length+' ocurrencias del '+dowName)
+    +card('Ayer vs promedio últimos 5 días', ayerS.total, avg5, 'prom. 5 días', 'Promedio de los últimos '+last5.length+' días con ventas');
+}
+
 function renderWoW(curr, prev){
   var c=parseO(curr), p=parseO(prev);
   var html='<table class="wt"><thead><tr><th>Métrica</th><th>Semana actual</th><th>Semana anterior</th><th>Variación</th></tr></thead><tbody>';
@@ -728,7 +803,7 @@ async function loadAll(){
 
     document.getElementById('load-msg').textContent='Cargando histórico...';
     var ws=monSt(td);
-    var h6S=add(ws,-42);
+    var h6S=add(ws,-28);
     var y=td.getFullYear(), mo=pad(td.getMonth()+1);
     var mtdStart=y+mo+'01';
     var histStart=lf(h6S)<mtdStart?lf(h6S):mtdStart;
@@ -741,7 +816,7 @@ async function loadAll(){
       var d=(o.dateOpen||'').substr(0,10).replace(/-/g,'');
       if(!histByDay[d])histByDay[d]=[];
       histByDay[d].push(o);
-      if(d.substr(0,6)===y+mo) mtdTotal+=(o.total||0);
+      if(d.substr(0,6)===(String(y)+mo)) mtdTotal+=(o.total||0);
     });
 
     // WoW splits
@@ -760,6 +835,7 @@ async function loadAll(){
     renderCats(mainS.catMap, iniStr, endStr);
     renderWoW(cw, pw);
     renderDayAvg(histByDay, tdStr);
+    renderCompare(histByDay, tdStr);
     renderPayments(filtered);
     renderAlerts(filtered, histByDay);
     renderTrends(filtered, histByDay);
