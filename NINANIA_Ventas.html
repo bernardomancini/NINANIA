@@ -777,6 +777,16 @@ function renderTracker(){
 }
 
 // ── LOAD ALL ──────────────────────────────────────────────────────────────────
+// placeholder — show "cargando..." in panels that need history
+function showHistLoading(id){
+  var el=document.getElementById(id);
+  if(el) el.innerHTML='<div class="empty" style="color:#d97706">⏳ Cargando histórico...</div>';
+}
+function showHistError(id){
+  var el=document.getElementById(id);
+  if(el) el.innerHTML='<div class="empty" style="color:#dc2626">Sin datos históricos — rango demasiado amplio.</div>';
+}
+
 async function loadAll(){
   var stLoad=document.getElementById('st-load');
   var stErr=document.getElementById('st-err');
@@ -791,60 +801,98 @@ async function loadAll(){
   var RNAMES={hoy:'hoy',ayer:'ayer','sem-act':'semana actual','sem-ant':'semana anterior','mes-act':'mes actual','mes-ant':'mes anterior','mes-2':'hace 2 meses','mes-3':'hace 3 meses',custom:'período'};
 
   try{
-    document.getElementById('load-msg').textContent='Cargando período seleccionado...';
+    // ── FASE 1: cargar solo el período seleccionado (rápido < 5s) ────────────
+    document.getElementById('load-msg').textContent='Cargando '+(RNAMES[activeRange]||'período')+'...';
     var iniStr=lf(iniDate), endStr=lf(endDate);
     var mainData=await apiSales(iniStr,endStr);
-
-    // Filter by day of week
     var filtered=activeDow===-1?mainData:mainData.filter(function(o){
       var d=new Date((o.dateOpen||'').substr(0,10)+'T12:00:00');
       return d.getDay()===activeDow;
     });
-
-    document.getElementById('load-msg').textContent='Cargando histórico...';
-    var ws=monSt(td);
-    var h6S=add(ws,-28);
-    var y=td.getFullYear(), mo=pad(td.getMonth()+1);
-    var mtdStart=y+mo+'01';
-    var histStart=lf(h6S)<mtdStart?lf(h6S):mtdStart;
-    var bigData=await apiSales(histStart,tdStr);
-
-    // Build histByDay
-    histByDay={};
-    var mtdTotal=0;
-    bigData.forEach(function(o){
-      var d=(o.dateOpen||'').substr(0,10).replace(/-/g,'');
-      if(!histByDay[d])histByDay[d]=[];
-      histByDay[d].push(o);
-      if(d.substr(0,6)===(String(y)+mo)) mtdTotal+=(o.total||0);
-    });
-
-    // WoW splits
-    var wsStr=lf(ws), pwS=lf(add(ws,-7)), pwE=lf(add(ws,-1));
-    var cw=[], pw=[];
-    Object.keys(histByDay).forEach(function(dk){
-      if(dk>=wsStr&&dk<=tdStr) cw=cw.concat(histByDay[dk]);
-      else if(dk>=pwS&&dk<=pwE) pw=pw.concat(histByDay[dk]);
-    });
-
     var mainS=parseO(filtered);
-    document.getElementById('load-msg').textContent='Renderizando...';
 
+    // Render immediately with what we have
     renderKPI(mainS, RNAMES[activeRange]||'período');
-    renderMeta(mtdTotal, tdStr, histByDay);
     renderCats(mainS.catMap, iniStr, endStr);
-    renderWoW(cw, pw);
-    renderDayAvg(histByDay, tdStr);
-    renderCompare(histByDay, tdStr);
     renderPayments(filtered);
-    renderAlerts(filtered, histByDay);
-    renderTrends(filtered, histByDay);
     buildProds(filtered);
     renderTracker();
+
+    // Show placeholders for history-dependent panels
+    showHistLoading('meta-area');
+    showHistLoading('proy-area');
+    showHistLoading('wow-area');
+    showHistLoading('day-area');
+    showHistLoading('compare-area');
+    showHistLoading('alerts-area');
+    showHistLoading('trends-area');
 
     stLoad.style.display='none';
     dash.style.display='';
     restoreLayout();
+
+    // ── FASE 2: cargar histórico en background (7 días semana actual + 7 anterior) ──
+    var y=td.getFullYear(), mo=pad(td.getMonth()+1);
+    var ws=monSt(td);
+
+    // Semana actual + semana anterior (14 días máx)
+    var wowStart=lf(add(ws,-7));
+    var wowData=null;
+    try{
+      wowData=await apiSales(wowStart, tdStr);
+    }catch(e2){ console.warn('WoW load failed',e2); }
+
+    if(wowData){
+      histByDay={};
+      wowData.forEach(function(o){
+        var d=(o.dateOpen||'').substr(0,10).replace(/-/g,'');
+        if(!histByDay[d])histByDay[d]=[];
+        histByDay[d].push(o);
+      });
+      var wsStr=lf(ws), pwS=lf(add(ws,-7)), pwE=lf(add(ws,-1));
+      var cw=[], pw=[];
+      Object.keys(histByDay).forEach(function(dk){
+        if(dk>=wsStr&&dk<=tdStr) cw=cw.concat(histByDay[dk]);
+        else if(dk>=pwS&&dk<=pwE) pw=pw.concat(histByDay[dk]);
+      });
+      renderWoW(cw, pw);
+      renderCompare(histByDay, tdStr);
+      renderAlerts(filtered, histByDay);
+    } else {
+      showHistError('wow-area');
+      showHistError('compare-area');
+      showHistError('alerts-area');
+    }
+
+    // ── FASE 3: cargar mes actual para meta + promedio día (MTD) ─────────────
+    var mtdStart=y+mo+'01';
+    var mtdData=null;
+    try{
+      mtdData=await apiSales(mtdStart, tdStr);
+    }catch(e3){ console.warn('MTD load failed',e3); }
+
+    if(mtdData){
+      var mtdHist={};
+      var mtdTotal=0;
+      mtdData.forEach(function(o){
+        var d=(o.dateOpen||'').substr(0,10).replace(/-/g,'');
+        if(!mtdHist[d])mtdHist[d]=[];
+        mtdHist[d].push(o);
+        mtdTotal+=(o.total||0);
+      });
+      // Merge into histByDay
+      Object.keys(mtdHist).forEach(function(dk){
+        if(!histByDay[dk]) histByDay[dk]=mtdHist[dk];
+      });
+      renderMeta(mtdTotal, tdStr, histByDay);
+      renderDayAvg(histByDay, tdStr);
+      renderTrends(filtered, histByDay);
+    } else {
+      showHistError('meta-area');
+      showHistError('proy-area');
+      showHistError('day-area');
+      showHistError('trends-area');
+    }
 
   }catch(e){
     console.error(e);
