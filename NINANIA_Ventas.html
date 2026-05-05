@@ -134,7 +134,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min
 </div>
 
 <script>
-var BASE='https://toteatglobal.appspot.com/mw/or/1.0';
+var BASE='/.netlify/functions/toteat';
 var P='xir=4902138748207104&xil=9&xiu=1001&xapitoken=5X4PaCSlPFjMVzG0q2lEiOnrpyBb6Km8';
 var META=850000000;
 var PZ_CATS=['COCINA PIZZERNA','PIZZA MÉDIUM','PIZZA M\u00c9DIUM','LAS CONOCIDAS','LAS QUERIDAS','PIZZA SANDWICH','ENTRADAS PIZZERNA','FLAT'];
@@ -148,7 +148,8 @@ function dsp(s){var M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oc
 function isPz(cat){return PZ_CATS.some(function(c){return cat&&cat.toUpperCase().indexOf(c.toUpperCase())>=0||c.toUpperCase().indexOf((cat||'').toUpperCase())>=0;});}
 
 function apiSales(ini,end){
-  return fetch(BASE+'/sales?ini='+ini+'&end='+end+'&'+P).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){return d.data||[];});
+  var url=BASE+'?endpoint=sales&ini='+ini+'&end='+end+'&'+P;
+  return fetch(url).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){return d.data||[];});
 }
 
 function parseO(orders){
